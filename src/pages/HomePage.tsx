@@ -1,185 +1,85 @@
-import {
-    Alert,
-    Box,
-    Button,
-    CircularProgress,
-    Stack,
-    Typography,
-} from "@mui/material";
-import { useCallback, useEffect, useState } from "react";
-
-const WIKI_API = "https://en.wikipedia.org/w/api.php";
-const WIKI_BASE = "https://en.wikipedia.org";
-
-async function fetchRandomWikiTitle(): Promise<string> {
-    const params = new URLSearchParams({
-        action: "query",
-        list: "random",
-        rnnamespace: "0",
-        rnlimit: "1",
-        format: "json",
-        origin: "*",
-    });
-    const res = await fetch(`${WIKI_API}?${params}`);
-    if (!res.ok) throw new Error("Failed to fetch random page");
-    const data = await res.json();
-    const title = data.query?.random?.[0]?.title;
-    if (!title) throw new Error("No random page returned");
-    return title;
-}
-
-async function fetchWikiPage(
-    title: string
-): Promise<{ html: string; title: string }> {
-    const pageToParse =
-        title.trim().toLowerCase() === "random"
-            ? await fetchRandomWikiTitle()
-            : title;
-
-    const params = new URLSearchParams({
-        action: "parse",
-        page: pageToParse,
-        prop: "text",
-        format: "json",
-        origin: "*",
-    });
-    const res = await fetch(`${WIKI_API}?${params}`);
-    if (!res.ok) throw new Error("Failed to fetch page");
-    const data = await res.json();
-    if (data.error) throw new Error(data.error.info || data.error.code);
-    const raw = data.parse.text["*"] as string;
-    // Fix relative links so they open on Wikipedia
-    const html = raw.replace(/ href="\/wiki\//g, ` href="${WIKI_BASE}/wiki/`);
-    return { html, title: pageToParse };
-}
-
-function getTitleFromWikiHref(href: string): string | null {
-    try {
-        const url = new URL(href, WIKI_BASE);
-        if (url.origin !== WIKI_BASE || !url.pathname.startsWith("/wiki/"))
-            return null;
-        const title = url.pathname.slice(6); // "/wiki/".length
-        return decodeURIComponent(title.replaceAll("_", " ")) || null;
-    } catch {
-        return null;
-    }
-}
+import { Box, Button, Stack, Typography } from "@mui/material";
+import { Link } from "react-router-dom";
+import { Header } from "../components/Header";
+import { PhotoViewer } from "../components/PhotoViewer";
 
 export const HomePage = () => {
-    const [pageTitle, setPageTitle] = useState("Wikipedia");
-    const [html, setHtml] = useState<string | null>(null);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
-    const [linksClicked, setLinksClicked] = useState<string[]>([]);
-
-    const handleWikiContentClick = useCallback(
-        (e: React.MouseEvent<HTMLDivElement>) => {
-            const target = e.target as HTMLElement;
-            const link = target.closest("a");
-
-            if (!link?.href) return;
-
-            const title = getTitleFromWikiHref(link.href);
-
-            if (!title) return;
-
-            e.preventDefault();
-            setLoading(true);
-            setError(null);
-            setPageTitle(title);
-
-            const allLinksClicked = linksClicked.concat(title);
-
-            setLinksClicked(allLinksClicked);
-
-            localStorage.setItem(
-                "linksClicked",
-                JSON.stringify(allLinksClicked)
-            );
-        },
-        [linksClicked]
-    );
-
-    useEffect(() => {
-        let cancelled = false;
-        fetchWikiPage(pageTitle)
-            .then(({ html }) => {
-                if (!cancelled) {
-                    setHtml(html);
-                }
-            })
-            .catch((err) => {
-                if (!cancelled) {
-                    setError(
-                        err instanceof Error
-                            ? err.message
-                            : "Something went wrong"
-                    );
-                    setHtml(null);
-                }
-            })
-            .finally(() => {
-                if (!cancelled) setLoading(false);
-            });
-        return () => {
-            cancelled = true;
-        };
-    }, [pageTitle]);
-
     return (
-        <Stack spacing={2}>
-            <Stack direction="row" alignItems="center" spacing={2}>
-                <img
-                    src="/wikipedia_logo.png"
-                    alt="Wikipedia"
-                    style={{ maxWidth: 120 }}
-                />
-                <Typography variant="h2">WikiDash</Typography>
-                <Button
-                    variant="outlined"
-                    onClick={() => {
-                        setLoading(true);
-                        setError(null);
-                        setPageTitle("random");
-                    }}
-                >
-                    Random page
-                </Button>
-            </Stack>
-            {error && (
-                <Alert severity="error" onClose={() => setError(null)}>
-                    {error}
-                </Alert>
-            )}
-
-            {loading && (
-                <Box display="flex" justifyContent="center" p={4}>
-                    <CircularProgress />
-                </Box>
-            )}
-
-            {!loading && html && (
+        <Stack sx={{ py: 10, px: 20, gap: 2 }}>
+            <Header title="WikiDash" isTitle />
+            <Button
+                component={Link}
+                to="/game"
+                variant="contained"
+                color="primary"
+                sx={{ width: "fit-content" }}
+            >
+                Start Challenge
+            </Button>
+            <Box sx={{ overflow: "auto" }}>
                 <Box
-                    className="wiki-content"
-                    onClick={handleWikiContentClick}
                     sx={{
-                        border: 1,
-                        borderColor: "divider",
-                        borderRadius: 1,
-                        p: 2,
-                        "& a": { color: "primary.main", cursor: "pointer" },
+                        float: "right",
+                        mr: 2,
+                        mb: 1,
                     }}
                 >
-                    <div
-                        dangerouslySetInnerHTML={{ __html: html }}
-                        style={{
-                            fontFamily: "sans-serif",
-                            fontSize: "0.95rem",
-                            lineHeight: 1.6,
-                        }}
+                    <PhotoViewer
+                        title="WikiDash"
+                        image={
+                            <img
+                                src="/wikipedia_logo.png"
+                                alt="Wikipedia"
+                                style={{ maxWidth: 100 }}
+                            />
+                        }
+                        infoLines={[
+                            {
+                                label: "Programmers",
+                                info: [
+                                    "Georgia Martinez",
+                                    "Maya Malavasi",
+                                    "Sydney Cole",
+                                ],
+                            },
+                            {
+                                label: "Platforms",
+                                info: ["Web"],
+                            },
+                            {
+                                label: "Release",
+                                info: ["TBD"],
+                            },
+                        ]}
                     />
                 </Box>
-            )}
+                <Typography variant="body1">
+                    WikiDash is a 2026 browser-based game that generates a new
+                    puzzle each day where users are tasked with navigating from
+                    one Wikipedia page to another as fast as possible by
+                    clicking links within the page. Players are ranked based on
+                    how long it took them to complete the puzzle and how many
+                    links they clicked.
+                </Typography>
+                <Typography variant="body1">
+                    Click here or the play button above to start the challenge
+                    of the day!
+                </Typography>
+            </Box>
+            <Header title="Support Wikipedia" />
+            <Typography variant="body1">
+                Insert text saying you should donate!
+            </Typography>
+            <Header title="Development" />
+            <Typography variant="body1">
+                WikiDash was developed by Georgia Martinez, Maya Malavasi, and
+                Sydney Cole for the 2026 Atomic Accelerator hackathon (February
+                27, 2026 - March X, 2026). The frontend of the project was built
+                using React, Next.js, Vite, and Material UI. The backend of the
+                project was built using... The project is dockerized and was
+                deployed using ...
+            </Typography>
+            <Typography variant="body1"></Typography>
         </Stack>
     );
 };
