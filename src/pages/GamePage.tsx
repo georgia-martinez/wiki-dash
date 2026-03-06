@@ -25,6 +25,14 @@ export const GamePage = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [linksClicked, setLinksClicked] = useState<string[]>([]);
+    const [elapsedSeconds, setElapsedSeconds] = useState(0);
+
+    useEffect(() => {
+        const id = setInterval(() => {
+            setElapsedSeconds((s) => s + 1);
+        }, 1000);
+        return () => clearInterval(id);
+    }, []);
 
     useEffect(() => {
         if (article2 && pageTitle === article2) {
@@ -97,6 +105,7 @@ export const GamePage = () => {
                 }}
             >
                 <Stack direction="row" justifyContent="space-between" gap={1}>
+                    {/* Get from article1 to article2 */}
                     <Stack direction="row" gap={1}>
                         <Typography variant="h5">Get from</Typography>
                         <Typography variant="h5" sx={{ fontWeight: "bold" }}>
@@ -108,13 +117,25 @@ export const GamePage = () => {
                         </Typography>
                     </Stack>
                     <Stack direction="row" gap={1}>
-                        <Typography variant="h5">Links clicked:</Typography>
-                        <Typography variant="h5" sx={{ fontWeight: "bold" }}>
-                            {linksClicked.length}
-                        </Typography>
+                        {/* Links clicked */}
+                        <Stack direction="row" gap={1}>
+                            <Typography variant="h5">Links clicked:</Typography>
+                            <Typography variant="h5" sx={{ fontWeight: "bold" }}>
+                                {linksClicked.length}
+                            </Typography>
+                        </Stack>
+                        {/* Timer */}
+                        <Stack direction="row" gap={1}>
+                            <Typography variant="h5">Time:</Typography>
+                            <Typography variant="h5" sx={{ fontWeight: "bold" }}>
+                                {Math.floor(elapsedSeconds / 60)}:
+                                {String(elapsedSeconds % 60).padStart(2, "0")}
+                            </Typography>
+                        </Stack>
                     </Stack>
                 </Stack>
                 <Stack direction="row" justifyContent="space-between" gap={1}>
+                    {/* Current article */}
                     <Stack direction="row" gap={1}>
                         <Typography variant="h5">Current article:</Typography>
                         <Typography variant="h5" sx={{ fontWeight: "bold" }}>
@@ -122,6 +143,7 @@ export const GamePage = () => {
                         </Typography>
                     </Stack>
                     {/* TODO: Get reset working */}
+                    {/* Reset button */}
                     <Stack direction="row" gap={1} alignItems="center">
                         <Typography variant="body2">
                             NOTE: Resetting will not reset links clicked or time
