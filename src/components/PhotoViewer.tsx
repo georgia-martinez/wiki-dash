@@ -20,7 +20,6 @@ export const PhotoViewer = ({ title, image, caption, infoLines }: Props) => {
     return (
         <Box
             sx={{
-                m: 0.5,
                 p: 2,
                 gap: 2,
                 justifyContent: "center",
@@ -45,9 +44,7 @@ export const PhotoViewer = ({ title, image, caption, infoLines }: Props) => {
                 >
                     {title}
                 </Typography>
-                <Box sx={{ display: "flex", justifyContent: "center" }}>
-                    {image}
-                </Box>
+                <Box sx={{ display: "flex", justifyContent: "center" }}>{image}</Box>
                 {caption && (
                     <Typography
                         variant="body2"
@@ -73,9 +70,8 @@ export const PhotoViewer = ({ title, image, caption, infoLines }: Props) => {
                 {infoLines.map((line, lineIndex) => {
                     const rowCount = line.info.length;
                     const startRow =
-                        infoLines
-                            .slice(0, lineIndex)
-                            .reduce((acc, l) => acc + l.info.length, 0) + 1;
+                        infoLines.slice(0, lineIndex).reduce((acc, l) => acc + l.info.length, 0) +
+                        1;
                     return (
                         <Fragment key={line.label}>
                             <Typography
@@ -92,24 +88,15 @@ export const PhotoViewer = ({ title, image, caption, infoLines }: Props) => {
                                 {line.label}
                             </Typography>
                             {line.info.map((item, i) => {
-                                const text =
-                                    typeof item === "string"
-                                        ? item
-                                        : item.label;
-                                const href =
-                                    typeof item === "string"
-                                        ? undefined
-                                        : item.link;
+                                const text = typeof item === "string" ? item : item.label;
+                                const href = typeof item === "string" ? undefined : item.link;
                                 return (
                                     <Box
                                         key={i}
                                         sx={{
                                             gridColumn: 2,
                                             gridRow: startRow + i,
-                                            mb:
-                                                i === line.info.length - 1
-                                                    ? 1
-                                                    : 0,
+                                            mb: i === line.info.length - 1 ? 1 : 0,
                                         }}
                                     >
                                         {href ? (
@@ -123,9 +110,7 @@ export const PhotoViewer = ({ title, image, caption, infoLines }: Props) => {
                                                 <span aria-hidden>↗</span>
                                             </Link>
                                         ) : (
-                                            <Typography variant="body2">
-                                                {text}
-                                            </Typography>
+                                            <Typography variant="body2">{text}</Typography>
                                         )}
                                     </Box>
                                 );

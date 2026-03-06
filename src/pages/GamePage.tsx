@@ -1,69 +1,36 @@
-import { Alert, Box, Button, CircularProgress, Stack } from "@mui/material";
+import { Alert, Box, Button, CircularProgress, Stack, Typography } from "@mui/material";
 import { useCallback, useEffect, useState } from "react";
-
-const WIKI_API = "https://en.wikipedia.org/w/api.php";
-const WIKI_BASE = "https://en.wikipedia.org";
-
-async function fetchRandomWikiTitle(): Promise<string> {
-    const params = new URLSearchParams({
-        action: "query",
-        list: "random",
-        rnnamespace: "0",
-        rnlimit: "1",
-        format: "json",
-        origin: "*",
-    });
-    const res = await fetch(`${WIKI_API}?${params}`);
-    if (!res.ok) throw new Error("Failed to fetch random page");
-    const data = await res.json();
-    const title = data.query?.random?.[0]?.title;
-    if (!title) throw new Error("No random page returned");
-    return title;
-}
-
-async function fetchWikiPage(
-    title: string
-): Promise<{ html: string; title: string }> {
-    const pageToParse =
-        title.trim().toLowerCase() === "random"
-            ? await fetchRandomWikiTitle()
-            : title;
-
-    const params = new URLSearchParams({
-        action: "parse",
-        page: pageToParse,
-        prop: "text",
-        format: "json",
-        origin: "*",
-    });
-    const res = await fetch(`${WIKI_API}?${params}`);
-    if (!res.ok) throw new Error("Failed to fetch page");
-    const data = await res.json();
-    if (data.error) throw new Error(data.error.info || data.error.code);
-    const raw = data.parse.text["*"] as string;
-    // Fix relative links so they open on Wikipedia
-    const html = raw.replace(/ href="\/wiki\//g, ` href="${WIKI_BASE}/wiki/`);
-    return { html, title: pageToParse };
-}
-
-function getTitleFromWikiHref(href: string): string | null {
-    try {
-        const url = new URL(href, WIKI_BASE);
-        if (url.origin !== WIKI_BASE || !url.pathname.startsWith("/wiki/"))
-            return null;
-        const title = url.pathname.slice(6); // "/wiki/".length
-        return decodeURIComponent(title.replaceAll("_", " ")) || null;
-    } catch {
-        return null;
-    }
-}
+import { fetchWikiPage, getRandomWikiPages, getTitleFromWikiHref } from "../utils/mediaWikiApi";
 
 export const GamePage = () => {
-    const [pageTitle, setPageTitle] = useState("Wikipedia");
+    const [puzzle, setPuzzle] = useState<[string, string] | null>(null);
+    const [pageTitle, setPageTitle] = useState("");
+
+    useEffect(() => {
+        let cancelled = false;
+        getRandomWikiPages().then(([a1, a2]) => {
+            if (!cancelled) {
+                setPuzzle([a1, a2]);
+                setPageTitle(a1);
+                console.log(`a1: ${a1}, a2: ${a2}`);
+            }
+        });
+        return () => {
+            cancelled = true;
+        };
+    }, []);
+
+    const article2 = puzzle?.[1] ?? "";
     const [html, setHtml] = useState<string | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [linksClicked, setLinksClicked] = useState<string[]>([]);
+
+    useEffect(() => {
+        if (article2 && pageTitle === article2) {
+            console.log("You won!");
+        }
+    }, [pageTitle, article2]);
 
     const handleWikiContentClick = useCallback(
         (e: React.MouseEvent<HTMLDivElement>) => {
@@ -85,15 +52,13 @@ export const GamePage = () => {
 
             setLinksClicked(allLinksClicked);
 
-            localStorage.setItem(
-                "linksClicked",
-                JSON.stringify(allLinksClicked)
-            );
+            localStorage.setItem("linksClicked", JSON.stringify(allLinksClicked));
         },
         [linksClicked]
     );
 
     useEffect(() => {
+        if (!pageTitle) return;
         let cancelled = false;
         fetchWikiPage(pageTitle)
             .then(({ html }) => {
@@ -103,11 +68,7 @@ export const GamePage = () => {
             })
             .catch((err) => {
                 if (!cancelled) {
-                    setError(
-                        err instanceof Error
-                            ? err.message
-                            : "Something went wrong"
-                    );
+                    setError(err instanceof Error ? err.message : "Something went wrong");
                     setHtml(null);
                 }
             })
@@ -121,28 +82,66 @@ export const GamePage = () => {
 
     return (
         <Stack spacing={2}>
-            <Button
-                variant="outlined"
-                onClick={() => {
-                    setLoading(true);
-                    setError(null);
-                    setPageTitle("random");
+            {/* Sticky header */}
+            <Stack
+                sx={{
+                    gap: 1,
+                    position: "sticky",
+                    top: 0,
+                    zIndex: 1,
+                    backgroundColor: "background.paper",
+                    py: 1,
+                    flexShrink: 0,
+                    borderBottom: "1px solid",
+                    borderColor: "divider",
                 }}
             >
-                Random page
-            </Button>
+                <Stack direction="row" justifyContent="space-between" gap={1}>
+                    <Stack direction="row" gap={1}>
+                        <Typography variant="h5">Get from</Typography>
+                        <Typography variant="h5" sx={{ fontWeight: "bold" }}>
+                            {puzzle?.[0]}
+                        </Typography>
+                        <Typography variant="h5">to</Typography>
+                        <Typography variant="h5" sx={{ fontWeight: "bold" }}>
+                            {puzzle?.[1]}
+                        </Typography>
+                    </Stack>
+                    <Stack direction="row" gap={1}>
+                        <Typography variant="h5">Links clicked:</Typography>
+                        <Typography variant="h5" sx={{ fontWeight: "bold" }}>
+                            {linksClicked.length}
+                        </Typography>
+                    </Stack>
+                </Stack>
+                <Stack direction="row" justifyContent="space-between" gap={1}>
+                    <Stack direction="row" gap={1}>
+                        <Typography variant="h5">Current article:</Typography>
+                        <Typography variant="h5" sx={{ fontWeight: "bold" }}>
+                            {pageTitle}
+                        </Typography>
+                    </Stack>
+                    {/* TODO: Get reset working */}
+                    <Stack direction="row" gap={1} alignItems="center">
+                        <Typography variant="body2">
+                            NOTE: Resetting will not reset links clicked or time
+                        </Typography>
+                        <Button variant="outlined" color="primary">
+                            Reset
+                        </Button>
+                    </Stack>
+                </Stack>
+            </Stack>
             {error && (
                 <Alert severity="error" onClose={() => setError(null)}>
                     {error}
                 </Alert>
             )}
-
             {loading && (
                 <Box display="flex" justifyContent="center" p={4}>
                     <CircularProgress />
                 </Box>
             )}
-
             {!loading && html && (
                 <Box
                     className="wiki-content"

@@ -5,17 +5,19 @@ import { PhotoViewer } from "../components/PhotoViewer";
 
 export const HomePage = () => {
     return (
-        <Stack sx={{ py: 10, px: 20, gap: 2 }}>
+        <Stack sx={{ px: 20, gap: 2, justifyContent: "center" }}>
+            <Stack direction="row" justifyContent="center">
+                <Button
+                    component={Link}
+                    to="/game"
+                    variant="outlined"
+                    color="primary"
+                    sx={{ width: "fit-content" }}
+                >
+                    Start Today's WikiDash
+                </Button>
+            </Stack>
             <Header title="WikiDash" isTitle />
-            <Button
-                component={Link}
-                to="/game"
-                variant="contained"
-                color="primary"
-                sx={{ width: "fit-content" }}
-            >
-                Start Challenge
-            </Button>
             <Box sx={{ overflow: "auto" }}>
                 <Box
                     sx={{
@@ -37,9 +39,18 @@ export const HomePage = () => {
                             {
                                 label: "Programmers",
                                 info: [
-                                    "Georgia Martinez",
-                                    "Maya Malavasi",
-                                    "Sydney Cole",
+                                    {
+                                        label: "Georgia Martinez",
+                                        link: "https://atomicobject.com/team/georgia-martinez",
+                                    },
+                                    {
+                                        label: "Maya Malavasi",
+                                        link: "https://atomicobject.com/team/maya-malavasi",
+                                    },
+                                    {
+                                        label: "Sydney Cole",
+                                        link: "https://atomicobject.com/team/sydney-cole",
+                                    },
                                 ],
                             },
                             {
@@ -54,30 +65,23 @@ export const HomePage = () => {
                     />
                 </Box>
                 <Typography variant="body1">
-                    WikiDash is a 2026 browser-based game that generates a new
-                    puzzle each day where users are tasked with navigating from
-                    one Wikipedia page to another as fast as possible by
-                    clicking links within the page. Players are ranked based on
-                    how long it took them to complete the puzzle and how many
-                    links they clicked.
+                    WikiDash is a 2026 browser-based game that generates a new puzzle each day where
+                    users are tasked with navigating from one Wikipedia page to another as fast as
+                    possible by clicking links within the page. Players are ranked based on how long
+                    it took them to complete the puzzle and how many links they clicked.
                 </Typography>
                 <Typography variant="body1">
-                    Click here or the play button above to start the challenge
-                    of the day!
+                    Click here or the play button above to start the challenge of the day!
                 </Typography>
             </Box>
             <Header title="Support Wikipedia" />
-            <Typography variant="body1">
-                Insert text saying you should donate!
-            </Typography>
+            <Typography variant="body1">Insert text saying you should donate!</Typography>
             <Header title="Development" />
             <Typography variant="body1">
-                WikiDash was developed by Georgia Martinez, Maya Malavasi, and
-                Sydney Cole for the 2026 Atomic Accelerator hackathon (February
-                27, 2026 - March X, 2026). The frontend of the project was built
-                using React, Next.js, Vite, and Material UI. The backend of the
-                project was built using... The project is dockerized and was
-                deployed using ...
+                WikiDash was developed by Georgia Martinez, Maya Malavasi, and Sydney Cole for the
+                2026 Atomic Accelerator hackathon (February 27, 2026 - March X, 2026). The frontend
+                of the project was built using React, Next.js, Vite, and Material UI. The backend of
+                the project was built using... The project is dockerized and was deployed using ...
             </Typography>
             <Typography variant="body1"></Typography>
         </Stack>
