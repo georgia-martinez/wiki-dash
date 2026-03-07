@@ -142,13 +142,22 @@ export const GamePage = () => {
                             {pageTitle}
                         </Typography>
                     </Stack>
-                    {/* TODO: Get reset working */}
                     {/* Reset button */}
                     <Stack direction="row" gap={1} alignItems="center">
                         <Typography variant="body2">
                             NOTE: Resetting will not reset links clicked or time
                         </Typography>
-                        <Button variant="outlined" color="primary">
+                        <Button
+                            variant="outlined"
+                            color="primary"
+                            onClick={() => {
+                                if (puzzle?.[0] && pageTitle !== puzzle[0]) {
+                                    setPageTitle(puzzle[0]);
+                                    setLoading(true);
+                                    setError(null);
+                                }
+                            }}
+                        >
                             Reset
                         </Button>
                     </Stack>
