@@ -1,4 +1,5 @@
 import { Box, Button, Dialog, DialogContent, Stack, TextField, Typography } from "@mui/material";
+import { SignInButton, useUser } from "@clerk/react";
 import { useState } from "react";
 import Confetti from "react-confetti";
 import { useNavigate } from "react-router-dom";
@@ -15,6 +16,7 @@ export const WinModal = ({ open, startArticle, endArticle, linksClicked, elapsed
     const [name, setName] = useState("");
     const [submitted, setSubmitted] = useState(false);
     const navigate = useNavigate();
+    const { isSignedIn, user } = useUser();
 
     const minutes = Math.floor(elapsedSeconds / 60);
     const seconds = String(elapsedSeconds % 60).padStart(2, "0");
@@ -25,6 +27,13 @@ export const WinModal = ({ open, startArticle, endArticle, linksClicked, elapsed
             // TODO: submit to leaderboard
         }
     };
+
+    const handleSignedInSubmit = () => {
+        setSubmitted(true);
+        // TODO: submit to leaderboard using user.fullName or user.username
+    };
+
+    const displayName = user?.fullName ?? user?.username ?? "";
 
     return (
         <>
@@ -77,11 +86,31 @@ export const WinModal = ({ open, startArticle, endArticle, linksClicked, elapsed
                             </Stack>
                         </Stack>
 
-                        {!submitted ? (
-                            <Stack spacing={1.5} width="100%">
+                        {submitted ? (
+                            <Typography variant="body1" color="success.main" fontWeight="bold">
+                                Thanks, {isSignedIn ? displayName : name}! You'll be on the leaderboard soon.
+                            </Typography>
+                        ) : isSignedIn ? (
+                            <Stack spacing={1.5} width="100%" alignItems="center">
                                 <Typography variant="body1" textAlign="center">
-                                    Enter your name for the leaderboard:
+                                    Submitting as <strong>{displayName}</strong>
                                 </Typography>
+                                <Button variant="outlined" onClick={handleSignedInSubmit} fullWidth>
+                                    Add to Leaderboard
+                                </Button>
+                            </Stack>
+                        ) : (
+                            <Stack spacing={1.5} width="100%">
+                                <Stack direction="row" gap={1} justifyContent="center">
+                                    <Typography variant="body1" textAlign="center">
+                                        Enter your name for the leaderboard, or
+                                    </Typography>
+                                    <SignInButton mode="modal">
+                                        <Button variant="text" size="small" sx={{ textTransform: "none", p: 0 }}>
+                                            sign in
+                                        </Button>
+                                    </SignInButton>
+                                </Stack>
                                 <Stack direction="row" gap={1}>
                                     <TextField
                                         fullWidth
@@ -96,10 +125,6 @@ export const WinModal = ({ open, startArticle, endArticle, linksClicked, elapsed
                                     </Button>
                                 </Stack>
                             </Stack>
-                        ) : (
-                            <Typography variant="body1" color="success.main" fontWeight="bold">
-                                Thanks, {name}! You'll be on the leaderboard soon.
-                            </Typography>
                         )}
 
                         <Button variant="contained" onClick={() => navigate("/leaderboard")} fullWidth>

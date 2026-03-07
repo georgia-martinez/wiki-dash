@@ -1,12 +1,15 @@
 import { Box, Button, Stack, Typography } from "@mui/material";
+import { SignInButton, UserButton, useUser } from "@clerk/react";
 import { Link } from "react-router-dom";
 import { Header } from "../components/Header";
 import { PhotoViewer } from "../components/PhotoViewer";
 
 export const HomePage = () => {
+    const { isSignedIn } = useUser();
+
     return (
         <Stack sx={{ px: 20, gap: 2, justifyContent: "center" }}>
-            <Stack direction="row" justifyContent="center">
+            <Stack direction="row" justifyContent="space-between" alignItems="center">
                 <Button
                     component={Link}
                     to="/game"
@@ -16,6 +19,17 @@ export const HomePage = () => {
                 >
                     Start Today's WikiDash
                 </Button>
+                <Stack direction="row" gap={1} alignItems="center">
+                    {isSignedIn ? (
+                        <UserButton />
+                    ) : (
+                        <SignInButton mode="modal">
+                            <Button variant="contained" color="primary">
+                                Sign In
+                            </Button>
+                        </SignInButton>
+                    )}
+                </Stack>
             </Stack>
             <Header title="WikiDash" isTitle />
             <Box sx={{ overflow: "auto" }}>
