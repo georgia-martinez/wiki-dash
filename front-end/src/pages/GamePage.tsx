@@ -1,5 +1,6 @@
 import { Alert, Box, Button, CircularProgress, Stack, Typography } from "@mui/material";
 import { useCallback, useEffect, useState } from "react";
+import { WinModal } from "../components/WinModal";
 import { fetchWikiPage, getRandomWikiPages, getTitleFromWikiHref } from "../utils/mediaWikiApi";
 
 export const GamePage = () => {
@@ -26,17 +27,19 @@ export const GamePage = () => {
     const [error, setError] = useState<string | null>(null);
     const [linksClicked, setLinksClicked] = useState<string[]>([]);
     const [elapsedSeconds, setElapsedSeconds] = useState(0);
+    const [won, setWon] = useState(false);
 
     useEffect(() => {
+        if (loading || won) return;
         const id = setInterval(() => {
             setElapsedSeconds((s) => s + 1);
         }, 1000);
         return () => clearInterval(id);
-    }, []);
+    }, [loading, won]);
 
     useEffect(() => {
         if (article2 && pageTitle === article2) {
-            console.log("You won!");
+            setWon(true);
         }
     }, [pageTitle, article2]);
 
@@ -90,6 +93,13 @@ export const GamePage = () => {
 
     return (
         <Stack spacing={2}>
+            <WinModal
+                open={won}
+                startArticle={puzzle?.[0] ?? ""}
+                endArticle={puzzle?.[1] ?? ""}
+                linksClicked={linksClicked.length}
+                elapsedSeconds={elapsedSeconds}
+            />
             {/* Sticky header */}
             <Stack
                 sx={{
