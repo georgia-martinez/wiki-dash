@@ -1,4 +1,5 @@
 import { Stack, Typography } from "@mui/material";
+import Scoreboard from "./Scoreboard";
 
 export const LeaderboardPage = () => {
     return (
@@ -9,6 +10,7 @@ export const LeaderboardPage = () => {
             <Typography variant="body1" color="text.secondary" sx={{ mt: 2 }}>
                 Coming soon!
             </Typography>
+            <Scoreboard/>
         </Stack>
     );
 };
