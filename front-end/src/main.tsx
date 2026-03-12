@@ -6,6 +6,9 @@ import { BrowserRouter } from "react-router-dom";
 import { App } from "./App.tsx";
 import { theme } from "./theme.ts";
 import { ClerkProvider } from '@clerk/react';
+import { ConvexProvider, ConvexReactClient } from "convex/react";
+
+const convex = new ConvexReactClient(import.meta.env.VITE_CONVEX_URL as string);
 
 createRoot(document.getElementById("root")!).render(
     <StrictMode>
@@ -13,7 +16,9 @@ createRoot(document.getElementById("root")!).render(
             <ThemeProvider theme={theme}>
                 <CssBaseline />
                     <ClerkProvider publishableKey={import.meta.env.VITE_CLERK_PUBLISHABLE_KEY}>
-                        <App />
+                        <ConvexProvider client={convex}>
+                            <App />
+                        </ConvexProvider>
                     </ClerkProvider>
             </ThemeProvider>
         </BrowserRouter>

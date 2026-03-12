@@ -1,4 +1,3 @@
-import "./Service.css";
 import { useQuery } from "convex/react";
 import { api } from "../../../back-end/convex/_generated/api";
 
