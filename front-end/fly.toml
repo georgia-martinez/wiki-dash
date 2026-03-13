@@ -1,4 +1,4 @@
-app = "wiki-dash-frontend"
+app = "wiki-dash"
 primary_region = "iad"
 
 [build]
