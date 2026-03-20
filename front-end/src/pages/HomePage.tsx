@@ -90,7 +90,7 @@ export const HomePage = () => {
             <Header title="Development" />
             <Typography variant="body1">
                 WikiDash was developed by Georgia Martinez, Maya Malavasi, and Sydney Cole for the
-                2026 Atomic Accelerator hackathon (February 27, 2026 - March X, 2026). The frontend
+                2026 Atomic Accelerator hackathon (February 27, 2026 - March 27, 2026). The frontend
                 of the project was built using React, Next.js, Vite, and Material UI. The backend of
                 the project was built using... The project is dockerized and was deployed using ...
             </Typography>
