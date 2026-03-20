@@ -31,7 +31,7 @@ VITE_CLERK_PUBLISHABLE_KEY=
 VITE_CONVEX_URL=http://127.0.0.1:3210
 ```
 
-You can get the `VITE_CLERK_PUBLISHABLE_KEY` from the Clerk dashboard: https://dashboard.clerk.com/ under API Keys. For local development, you can leave `VITE_CONVEX_URL` as is.
+You can get the `VITE_CLERK_PUBLISHABLE_KEY` from the Clerk dashboard: https://dashboard.clerk.com/ under API Keys. You can leave the `VITE_CONVEX_URL` as is.
 
 ### Step 3: Install Docker
 
@@ -52,6 +52,8 @@ docker compose up
 ```
 
 Keep this process running while developing. It will watch for changes and automatically.
+
+The local database can be viewed at http://localhost:6791. This is where the local convex dashboard is running. You will need to generate a key to login (insert instructions idk how to do this yet).
 
 ## Development Workflow
 
