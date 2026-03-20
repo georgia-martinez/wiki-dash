@@ -1,5 +1,5 @@
-import { Box, Button, Stack, Typography } from "@mui/material";
 import { SignInButton, UserButton, useUser } from "@clerk/react";
+import { Box, Button, Stack, Typography } from "@mui/material";
 import { Link } from "react-router-dom";
 import { Header } from "../components/Header";
 import { PhotoViewer } from "../components/PhotoViewer";
@@ -83,9 +83,6 @@ export const HomePage = () => {
                     users are tasked with navigating from one Wikipedia page to another as fast as
                     possible by clicking links within the page. Players are ranked based on how long
                     it took them to complete the puzzle and how many links they clicked.
-                </Typography>
-                <Typography variant="body1">
-                    Click here or the play button above to start the challenge of the day!
                 </Typography>
             </Box>
             <Header title="Support Wikipedia" />
