@@ -1,29 +1,28 @@
 import { Alert, Box, Button, CircularProgress, Stack, Typography } from "@mui/material";
 import { useCallback, useEffect, useState } from "react";
+import { useQuery } from "convex/react";
+import { api } from "../../../back-end/convex/_generated/api";
 import { WinModal } from "../components/WinModal";
-import { fetchWikiPage, getRandomWikiPages, getTitleFromWikiHref } from "../utils/mediaWikiApi";
+import { fetchWikiPage, getTitleFromWikiHref } from "../utils/mediaWikiApi";
 
 export const GamePage = () => {
-    const [puzzle, setPuzzle] = useState<[string, string] | null>(null);
+    const dailyChallenge = useQuery(api.challenges.getTodaysChallenge);
+    const puzzle: [string, string] | null =
+        dailyChallenge ? [dailyChallenge.article1, dailyChallenge.article2] : null;
     const [pageTitle, setPageTitle] = useState("");
 
     useEffect(() => {
-        let cancelled = false;
-        getRandomWikiPages().then(([a1, a2]) => {
-            if (!cancelled) {
-                setPuzzle([a1, a2]);
-                setPageTitle(a1);
-                console.log(`a1: ${a1}, a2: ${a2}`);
-            }
-        });
-        return () => {
-            cancelled = true;
-        };
-    }, []);
+        if (dailyChallenge === null) {
+            setLoading(false);
+        } else if (puzzle && !pageTitle) {
+            setPageTitle(puzzle[0]);
+        }
+    }, [puzzle, dailyChallenge]);
 
     const article2 = puzzle?.[1] ?? "";
     const [html, setHtml] = useState<string | null>(null);
     const [loading, setLoading] = useState(true);
+    const challengeLoading = dailyChallenge === undefined;
     const [error, setError] = useState<string | null>(null);
     const [linksClicked, setLinksClicked] = useState<string[]>([]);
     const [elapsedSeconds, setElapsedSeconds] = useState(0);
@@ -178,10 +177,13 @@ export const GamePage = () => {
                     {error}
                 </Alert>
             )}
-            {loading && (
+            {(challengeLoading || loading) && (
                 <Box display="flex" justifyContent="center" p={4}>
                     <CircularProgress />
                 </Box>
+            )}
+            {!challengeLoading && !dailyChallenge && (
+                <Alert severity="warning">No challenge set for today yet. Check back soon!</Alert>
             )}
             {!loading && html && (
                 <Box
