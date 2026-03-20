@@ -47,11 +47,10 @@ jobs:
             georgiamartinez/wiki-dash:${{ steps.env.outputs.image_tag }}
             georgiamartinez/wiki-dash:${{ github.sha }}
 
-      - name: Setup flyctl
-        uses: superfly/flyctl-actions/setup-flyctl@master
-
       - name: Deploy frontend to Fly
-        run: fly deploy --config ${{ steps.env.outputs.fly_config }} --image georgiamartinez/wiki-dash:${{ steps.env.outputs.image_tag }}
+        uses: superfly/flyctl-actions@master
+        with:
+          args: "deploy --config ${{ steps.env.outputs.fly_config }} --image georgiamartinez/wiki-dash:${{ steps.env.outputs.image_tag }}"
         env:
           FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
 
@@ -70,10 +69,9 @@ jobs:
             echo "fly_config=back-end/fly.staging.toml" >> $GITHUB_OUTPUT
           fi
 
-      - name: Setup flyctl
-        uses: superfly/flyctl-actions/setup-flyctl@master
-
       - name: Deploy backend to Fly
-        run: fly deploy --config ${{ steps.env.outputs.fly_config }}
+        uses: superfly/flyctl-actions@master
+        with:
+          args: "deploy --config ${{ steps.env.outputs.fly_config }}"
         env:
           FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
