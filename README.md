@@ -53,7 +53,17 @@ docker compose up
 
 Keep this process running while developing. It will watch for changes and automatically.
 
-The local database can be viewed at http://localhost:6791. This is where the local convex dashboard is running. You will need to generate a key to login (insert instructions idk how to do this yet).
+The local database can be viewed at http://localhost:6791. This is where the local convex dashboard is running. You will need to generate a key to login:
+
+```
+fly ssh console --command "./generate_admin_key.sh"
+```
+
+If you want to input data, you may either do so manually through the local database link, or by uploading the JSON file of prepared data by running the following command:
+
+```
+npx convex import --table scores sampleData.jsonl
+```
 
 ## Development Workflow
 
