@@ -6,32 +6,45 @@ const WIKI_BASE = "https://en.wikipedia.org";
  * Fetches a single random Wikipedia article title.
  */
 export async function fetchRandomWikiTitle(): Promise<string> {
-    const titles = await fetchRandomTitles(1);
-    const title = titles[0];
+    const [title] = await getRandomWikiPages();
     if (!title) throw new Error("No random page returned");
     return title;
 }
 
+const WIKIMEDIA_API = "https://wikimedia.org/api/rest_v1";
+
+const EXCLUDED_TITLES = new Set([
+    "Main Page",
+    "Special:Search",
+    "Wikipedia:Contents",
+]);
+
 /**
- * Fetches random Wikipedia article titles from the MediaWiki API.
- * @param count - Number of distinct titles to return (default 2)
+ * Fetches the top viewed Wikipedia article titles from the previous day.
  */
-export async function fetchRandomTitles(count: number): Promise<string[]> {
-    const params = new URLSearchParams({
-        action: "query",
-        list: "random",
-        rnnamespace: "0",
-        rnlimit: String(Math.max(count * 2, 10)),
-        format: "json",
-        origin: "*",
-    });
-    const res = await fetch(`${WIKI_API}?${params}`);
-    if (!res.ok) throw new Error("Failed to fetch random pages");
+async function fetchPopularTitles(): Promise<string[]> {
+    const yesterday = new Date();
+    yesterday.setDate(yesterday.getDate() - 1);
+    const year = yesterday.getFullYear();
+    const month = String(yesterday.getMonth() + 1).padStart(2, "0");
+    const day = String(yesterday.getDate()).padStart(2, "0");
+
+    const res = await fetch(
+        `${WIKIMEDIA_API}/metrics/pageviews/top/en.wikipedia/all-access/${year}/${month}/${day}`
+    );
+    if (!res.ok) throw new Error("Failed to fetch popular pages");
     const data = await res.json();
-    const items = data.query?.random ?? [];
-    if (!Array.isArray(items) || items.length === 0)
-        throw new Error("No random pages returned");
-    return items.map((item: { title: string }) => item.title);
+    const articles = data.items?.[0]?.articles ?? [];
+
+    return articles
+        .map((a: { article: string }) => a.article.replaceAll("_", " "))
+        .filter(
+            (title: string) =>
+                !EXCLUDED_TITLES.has(title) &&
+                !title.startsWith("Special:") &&
+                !title.startsWith("Wikipedia:") &&
+                !title.startsWith("Portal:")
+        );
 }
 
 /**
@@ -41,25 +54,15 @@ export async function fetchRandomTitles(count: number): Promise<string[]> {
 const MAX_TITLE_LENGTH = 20;
 
 export async function getRandomWikiPages(): Promise<[string, string]> {
-    const distinct: string[] = [];
-    while (distinct.length < 2) {
-        const titles = await fetchRandomTitles(2);
+    const pool = await fetchPopularTitles();
+    const filtered = pool.filter((t) => t.length <= MAX_TITLE_LENGTH);
+    if (filtered.length < 2) throw new Error("Not enough popular articles");
 
-        for (const title of titles) {
-            if (title && !distinct.includes(title)) {
-                distinct.push(title);
-                if (distinct.length === 2) break;
-            }
-        }
-        if (
-            distinct.length === 2 &&
-            (distinct[0].length > MAX_TITLE_LENGTH ||
-                distinct[1].length > MAX_TITLE_LENGTH)
-        ) {
-            distinct.length = 0;
-        }
-    }
-    return [distinct[0], distinct[1]];
+    const i = Math.floor(Math.random() * filtered.length);
+    let j = Math.floor(Math.random() * (filtered.length - 1));
+    if (j >= i) j++;
+
+    return [filtered[i], filtered[j]];
 }
 
 /**
