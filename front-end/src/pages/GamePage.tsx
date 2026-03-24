@@ -189,8 +189,9 @@ export const GamePage = () => {
             {!challengeLoading && !dailyChallenge && (
                 <Alert severity="warning">No challenge set for today yet. Check back soon!</Alert>
             )}
-            {!loading && html && (
+            {html && (
                 <Box
+                    display={loading ? "none" : "block"}
                     className="wiki-content"
                     onClick={handleWikiContentClick}
                     sx={{
