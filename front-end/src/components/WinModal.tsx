@@ -24,15 +24,8 @@ export const WinModal = ({ open, startArticle, endArticle, linksClicked, elapsed
     const minutes = Math.floor(elapsedSeconds / 60);
     const seconds = String(elapsedSeconds % 60).padStart(2, "0");
 
-    const handleSubmit = () => {
-        if (name.trim()) {
-            submitScore({ username: name.trim(), pagesClicked: linksClicked, timeSpent: elapsedSeconds });
-            setSubmitted(true);
-        }
-    };
-
-    const handleSignedInSubmit = () => {
-        submitScore({ username: displayName, pagesClicked: linksClicked, timeSpent: elapsedSeconds });
+    const handleSubmit = (username: string) => {
+        submitScore({ username, pagesClicked: linksClicked, timeSpent: elapsedSeconds });
         setSubmitted(true);
     };
 
@@ -98,7 +91,7 @@ export const WinModal = ({ open, startArticle, endArticle, linksClicked, elapsed
                                 <Typography variant="body1" textAlign="center">
                                     Submitting as <strong>{displayName}</strong>
                                 </Typography>
-                                <Button variant="outlined" onClick={handleSignedInSubmit} fullWidth>
+                                <Button variant="outlined" onClick={() => handleSubmit(displayName)} fullWidth>
                                     Add to Leaderboard
                                 </Button>
                             </Stack>
@@ -121,9 +114,9 @@ export const WinModal = ({ open, startArticle, endArticle, linksClicked, elapsed
                                         placeholder="Your name"
                                         value={name}
                                         onChange={(e) => setName(e.target.value)}
-                                        onKeyDown={(e) => e.key === "Enter" && handleSubmit()}
+                                        onKeyDown={(e) => e.key === "Enter" && handleSubmit(name.trim())}
                                     />
-                                    <Button variant="contained" onClick={handleSubmit} disabled={!name.trim()}>
+                                    <Button variant="contained" onClick={() => handleSubmit(name.trim())} disabled={!name.trim()}>
                                         Submit
                                     </Button>
                                 </Stack>
