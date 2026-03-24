@@ -1,4 +1,4 @@
-import { Alert, Box, Button, CircularProgress, Stack, Typography } from "@mui/material";
+import { Alert, Box, Button, CircularProgress, Snackbar, Stack, Typography } from "@mui/material";
 import { useCallback, useEffect, useState } from "react";
 import { useQuery } from "convex/react";
 import { api } from "../../../back-end/convex/_generated/api";
@@ -27,6 +27,7 @@ export const GamePage = () => {
     const [linksClicked, setLinksClicked] = useState<string[]>([]);
     const [elapsedSeconds, setElapsedSeconds] = useState(0);
     const [won, setWon] = useState(false);
+    const [showNonWikiAlert, setShowNonWikiAlert] = useState(false);
 
     useEffect(() => {
         if (loading || won) return;
@@ -49,11 +50,14 @@ export const GamePage = () => {
 
             if (!link?.href) return;
 
+            e.preventDefault();
+
             const title = getTitleFromWikiHref(link.href);
 
-            if (!title) return;
-
-            e.preventDefault();
+            if (!title) {
+                setShowNonWikiAlert(true);
+                return;
+            }
             setLoading(true);
             setError(null);
             setPageTitle(title);
@@ -207,6 +211,16 @@ export const GamePage = () => {
                     />
                 </Box>
             )}
+            <Snackbar
+                open={showNonWikiAlert}
+                autoHideDuration={3000}
+                onClose={() => setShowNonWikiAlert(false)}
+                anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+            >
+                <Alert severity="warning" onClose={() => setShowNonWikiAlert(false)}>
+                    You can only follow links to other Wikipedia articles!
+                </Alert>
+            </Snackbar>
         </Stack>
     );
 };
