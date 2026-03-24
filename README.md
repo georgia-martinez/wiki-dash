@@ -65,7 +65,6 @@ If you want to input data, you may either do so manually through the local datab
 
 ```
 npx convex import --table scores sampleData.jsonl
-npx convex import --table dailyChallenge samplechallenge.jsonl
 ```
 
 ## Development Workflow
