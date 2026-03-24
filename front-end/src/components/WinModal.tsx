@@ -3,6 +3,8 @@ import { SignInButton, useUser } from "@clerk/react";
 import { useState } from "react";
 import Confetti from "react-confetti";
 import { useNavigate } from "react-router-dom";
+import { useMutation } from "convex/react";
+import { api } from "../../../back-end/convex/_generated/api";
 
 interface WinModalProps {
     open: boolean;
@@ -17,20 +19,21 @@ export const WinModal = ({ open, startArticle, endArticle, linksClicked, elapsed
     const [submitted, setSubmitted] = useState(false);
     const navigate = useNavigate();
     const { isSignedIn, user } = useUser();
+    const submitScore = useMutation(api.scores.submit);
 
     const minutes = Math.floor(elapsedSeconds / 60);
     const seconds = String(elapsedSeconds % 60).padStart(2, "0");
 
     const handleSubmit = () => {
         if (name.trim()) {
+            submitScore({ username: name.trim(), pagesClicked: linksClicked, timeSpent: elapsedSeconds });
             setSubmitted(true);
-            // TODO: submit to leaderboard
         }
     };
 
     const handleSignedInSubmit = () => {
+        submitScore({ username: displayName, pagesClicked: linksClicked, timeSpent: elapsedSeconds });
         setSubmitted(true);
-        // TODO: submit to leaderboard using user.fullName or user.username
     };
 
     const displayName = user?.fullName ?? user?.username ?? "";

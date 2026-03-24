@@ -83,33 +83,43 @@ function Scoreboard({ sortBy }: { sortBy: SortBy }) {
             </TableRow>
           </TableHead>
           <TableBody>
-            {sorted.map(({ _id, username, pagesClicked, timeSpent }, index) => {
-              const isTopThree = index < 3;
-              return (
-                <TableRow
-                  key={_id}
-                  sx={{
-                    bgcolor: isTopThree ? `${Object.values(MEDAL_COLORS)[index].bg}18` : "white",
-                    "&:last-child td": { border: 0 },
-                    transition: "background-color 0.15s",
-                    "&:hover": { bgcolor: "#f5f5f5" },
-                  }}
-                >
-                  <RankCell rank={index} />
-                  <TableCell>
-                    <Typography fontWeight={isTopThree ? 700 : 400}>
-                      {username}
-                    </Typography>
-                  </TableCell>
-                  <TableCell align="right">
-                    <Typography>{pagesClicked}</Typography>
-                  </TableCell>
-                  <TableCell align="right">
-                    <Typography color="text.secondary">{timeSpent}</Typography>
-                  </TableCell>
-                </TableRow>
-              );
-            })}
+            {sorted.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={4} align="center" sx={{ py: 4 }}>
+                  <Typography color="text.secondary">
+                    {scores === undefined ? "Loading..." : "No scores yet. Be the first to play!"}
+                  </Typography>
+                </TableCell>
+              </TableRow>
+            ) : (
+              sorted.map(({ _id, username, pagesClicked, timeSpent }, index) => {
+                const isTopThree = index < 3;
+                return (
+                  <TableRow
+                    key={_id}
+                    sx={{
+                      bgcolor: isTopThree ? `${Object.values(MEDAL_COLORS)[index].bg}18` : "white",
+                      "&:last-child td": { border: 0 },
+                      transition: "background-color 0.15s",
+                      "&:hover": { bgcolor: "#f5f5f5" },
+                    }}
+                  >
+                    <RankCell rank={index} />
+                    <TableCell>
+                      <Typography fontWeight={isTopThree ? 700 : 400}>
+                        {username}
+                      </Typography>
+                    </TableCell>
+                    <TableCell align="right">
+                      <Typography>{pagesClicked}</Typography>
+                    </TableCell>
+                    <TableCell align="right">
+                      <Typography color="text.secondary">{timeSpent}</Typography>
+                    </TableCell>
+                  </TableRow>
+                );
+              })
+            )}
           </TableBody>
         </Table>
       </TableContainer>
