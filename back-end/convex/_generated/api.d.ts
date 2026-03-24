@@ -8,6 +8,8 @@
  * @module
  */
 
+import type * as challenges from "../challenges.js";
+import type * as crons from "../crons.js";
 import type * as scores from "../scores.js";
 
 import type {
@@ -17,6 +19,8 @@ import type {
 } from "convex/server";
 
 declare const fullApi: ApiFromModules<{
+  challenges: typeof challenges;
+  crons: typeof crons;
   scores: typeof scores;
 }>;
 

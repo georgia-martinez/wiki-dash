@@ -7,6 +7,11 @@ export default defineSchema({
     pagesClicked: v.number(),
     timeSpent: v.number(),
   }),
+  dailyChallenge: defineTable({
+    date: v.string(), // YYYY-MM-DD
+    article1: v.string(),
+    article2: v.string(),
+  }).index("by_date", ["date"]),
 });
 
 //make schema

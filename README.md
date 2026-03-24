@@ -56,8 +56,10 @@ Keep this process running while developing. It will watch for changes and automa
 The local database can be viewed at http://localhost:6791. This is where the local convex dashboard is running. You will need to generate a key to login:
 
 ```
-fly ssh console --command "./generate_admin_key.sh"
+docker compose exec backend ./generate_admin_key.sh
 ```
+
+Copy the key in it's entirety, including the prefix at the beginning.
 
 If you want to input data, you may either do so manually through the local database link, or by uploading the JSON file of prepared data by running the following command:
 
