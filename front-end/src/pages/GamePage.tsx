@@ -140,7 +140,7 @@ export const GamePage = () => {
                         {/* Timer */}
                         <Stack direction="row" gap={1}>
                             <Typography variant="h5">Time:</Typography>
-                            <Typography variant="h5" sx={{ fontWeight: "bold" }}>
+                            <Typography variant="h5" sx={{ fontWeight: "bold", fontVariantNumeric: "tabular-nums", minWidth: "4ch" }}>
                                 {Math.floor(elapsedSeconds / 60)}:
                                 {String(elapsedSeconds % 60).padStart(2, "0")}
                             </Typography>
