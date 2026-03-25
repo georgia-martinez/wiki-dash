@@ -12,9 +12,10 @@ interface WinModalProps {
     endArticle: string;
     linksClicked: number;
     elapsedSeconds: number;
+    isRandom?: boolean;
 }
 
-export const WinModal = ({ open, startArticle, endArticle, linksClicked, elapsedSeconds }: WinModalProps) => {
+export const WinModal = ({ open, startArticle, endArticle, linksClicked, elapsedSeconds, isRandom }: WinModalProps) => {
     const [name, setName] = useState("");
     const [submitted, setSubmitted] = useState(false);
     const navigate = useNavigate();
@@ -25,7 +26,7 @@ export const WinModal = ({ open, startArticle, endArticle, linksClicked, elapsed
     const seconds = String(elapsedSeconds % 60).padStart(2, "0");
 
     const handleSubmit = (username: string) => {
-        submitScore({ username, pagesClicked: linksClicked, timeSpent: elapsedSeconds });
+        submitScore({ username, pagesClicked: linksClicked, timeSpent: elapsedSeconds, date: new Date().toISOString() });
         setSubmitted(true);
     };
 
@@ -82,7 +83,7 @@ export const WinModal = ({ open, startArticle, endArticle, linksClicked, elapsed
                             </Stack>
                         </Stack>
 
-                        {submitted ? (
+                        {!isRandom && (submitted ? (
                             <Typography variant="body1" color="success.main" fontWeight="bold">
                                 Thanks, {isSignedIn ? displayName : name}! You'll be on the leaderboard soon.
                             </Typography>
@@ -121,11 +122,16 @@ export const WinModal = ({ open, startArticle, endArticle, linksClicked, elapsed
                                     </Button>
                                 </Stack>
                             </Stack>
-                        )}
+                        ))}
 
-                        <Button variant="contained" onClick={() => navigate("/leaderboard")} fullWidth>
-                            View Leaderboard
-                        </Button>
+                        {!isRandom && (
+                            <Button variant="contained" onClick={() => navigate("/leaderboard")} fullWidth>
+                                View Leaderboard
+                            </Button>
+                        )}
+                        <Button variant="outlined" onClick={() => navigate("/")} fullWidth>
+                            Back to Home
+                         </Button>
                     </Stack>
                 </DialogContent>
             </Dialog>

@@ -1,28 +1,49 @@
 import { Alert, Box, Button, CircularProgress, Snackbar, Stack, Typography } from "@mui/material";
 import { useCallback, useEffect, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import { useQuery } from "convex/react";
 import { api } from "../../../back-end/convex/_generated/api";
 import { WinModal } from "../components/WinModal";
-import { fetchWikiPage, getTitleFromWikiHref } from "../utils/mediaWikiApi";
+import { fetchWikiPage, getRandomWikiPages, getTitleFromWikiHref } from "../utils/mediaWikiApi";
 
 export const GamePage = () => {
+    const [searchParams] = useSearchParams();
+    const isRandom = searchParams.get("mode") === "random";
+
     const dailyChallenge = useQuery(api.challenges.getTodaysChallenge);
-    const puzzle: [string, string] | null =
-        dailyChallenge ? [dailyChallenge.article1, dailyChallenge.article2] : null;
+    const [randomPuzzle, setRandomPuzzle] = useState<[string, string] | null>(null);
+    const [randomLoading, setRandomLoading] = useState(isRandom);
+
+    useEffect(() => {
+        if (!isRandom) return;
+        getRandomWikiPages()
+            .then((pages) => {
+                setRandomPuzzle(pages);
+                setRandomLoading(false);
+            })
+            .catch(() => {
+                setRandomLoading(false);
+            });
+    }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+    const puzzle: [string, string] | null = isRandom
+        ? randomPuzzle
+        : dailyChallenge ? [dailyChallenge.article1, dailyChallenge.article2] : null;
+
     const [pageTitle, setPageTitle] = useState("");
 
     useEffect(() => {
-        if (dailyChallenge === null) {
+        if (!isRandom && dailyChallenge === null) {
             setLoading(false);
         } else if (puzzle && !pageTitle) {
             setPageTitle(puzzle[0]);
         }
-    }, [puzzle, dailyChallenge]);
+    }, [puzzle, dailyChallenge, isRandom]);
 
     const article2 = puzzle?.[1] ?? "";
     const [html, setHtml] = useState<string | null>(null);
     const [loading, setLoading] = useState(true);
-    const challengeLoading = dailyChallenge === undefined;
+    const challengeLoading = isRandom ? randomLoading : dailyChallenge === undefined;
     const [error, setError] = useState<string | null>(null);
     const [linksClicked, setLinksClicked] = useState<string[]>([]);
     const [elapsedSeconds, setElapsedSeconds] = useState(0);
@@ -102,6 +123,7 @@ export const GamePage = () => {
                 endArticle={puzzle?.[1] ?? ""}
                 linksClicked={linksClicked.length}
                 elapsedSeconds={elapsedSeconds}
+                isRandom={isRandom}
             />
             {/* Sticky header */}
             <Stack
