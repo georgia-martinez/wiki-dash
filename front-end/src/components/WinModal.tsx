@@ -26,7 +26,7 @@ export const WinModal = ({ open, startArticle, endArticle, linksClicked, elapsed
     const seconds = String(elapsedSeconds % 60).padStart(2, "0");
 
     const handleSubmit = (username: string) => {
-        submitScore({ username, pagesClicked: linksClicked, timeSpent: elapsedSeconds, date: new Date().toISOString() });
+        submitScore({ username, pagesClicked: linksClicked, timeSpent: elapsedSeconds, date: new Date().toISOString().split("T")[0] });
         setSubmitted(true);
     };
 
