@@ -32,6 +32,16 @@ export const ensureTodaysChallenge = mutation({
     },
 });
 
+export const getChallengeByDate = query({
+    args: { date: v.string() },
+    handler: async (ctx, { date }) => {
+        return await ctx.db
+            .query("dailyChallenge")
+            .withIndex("by_date", (q) => q.eq("date", date))
+            .unique();
+    },
+});
+
 export const setDailyChallenge = internalMutation({
     args: { article1: v.string(), article2: v.string() },
     handler: async (ctx, { article1, article2 }) => {

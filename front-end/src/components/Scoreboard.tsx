@@ -50,10 +50,14 @@ function RankCell({ rank }: { rank: number }) {
   );
 }
 
-function Scoreboard({ sortBy }: { sortBy: SortBy }) {
+function Scoreboard({ sortBy, selectedDate }: { sortBy: SortBy; selectedDate?: string }) {
   const scores = useQuery(api.scores.get);
 
-  const sorted = [...(scores ?? [])].sort((a, b) =>
+  const filtered = (scores ?? []).filter((s) =>
+    selectedDate ? s.date === selectedDate : true
+  );
+
+  const sorted = [...filtered].sort((a, b) =>
     sortBy === "time" ? a.timeSpent - b.timeSpent : a.pagesClicked - b.pagesClicked
   );
 
