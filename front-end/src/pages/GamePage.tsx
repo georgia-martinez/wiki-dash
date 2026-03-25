@@ -1,12 +1,14 @@
 import { Alert, Box, Button, CircularProgress, Snackbar, Stack, Typography } from "@mui/material";
-import { useCallback, useEffect, useState } from "react";
-import { useQuery } from "convex/react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { useMutation, useQuery } from "convex/react";
 import { api } from "../../../back-end/convex/_generated/api";
 import { WinModal } from "../components/WinModal";
 import { fetchWikiPage, getTitleFromWikiHref } from "../utils/mediaWikiApi";
 
 export const GamePage = () => {
     const dailyChallenge = useQuery(api.challenges.getTodaysChallenge);
+    const ensureTodaysChallenge = useMutation(api.challenges.ensureTodaysChallenge);
+    const ensureKickSent = useRef(false);
     const puzzle: [string, string] | null =
         dailyChallenge ? [dailyChallenge.article1, dailyChallenge.article2] : null;
     const [pageTitle, setPageTitle] = useState("");
@@ -24,6 +26,15 @@ export const GamePage = () => {
     const [loading, setLoading] = useState(true);
     const challengeLoading = dailyChallenge === undefined;
     const [error, setError] = useState<string | null>(null);
+
+    useEffect(() => {
+        if (challengeLoading || dailyChallenge !== null) return;
+        if (ensureKickSent.current) return;
+        ensureKickSent.current = true;
+        void ensureTodaysChallenge().catch(() => {
+            ensureKickSent.current = false;
+        });
+    }, [challengeLoading, dailyChallenge, ensureTodaysChallenge]);
     const [linksClicked, setLinksClicked] = useState<string[]>([]);
     const [elapsedSeconds, setElapsedSeconds] = useState(0);
     const [won, setWon] = useState(false);

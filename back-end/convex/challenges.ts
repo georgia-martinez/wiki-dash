@@ -1,4 +1,4 @@
-import { internalAction, internalMutation, query } from "./_generated/server";
+import { internalAction, internalMutation, mutation, query } from "./_generated/server";
 import { v } from "convex/values";
 import { internal } from "./_generated/api";
 
@@ -15,6 +15,20 @@ export const getTodaysChallenge = query({
             .query("dailyChallenge")
             .withIndex("by_date", (q) => q.eq("date", today))
             .unique();
+    },
+});
+
+/** If the cron missed (e.g. backend was down), the first client without a row schedules the same fetch action. */
+export const ensureTodaysChallenge = mutation({
+    args: {},
+    handler: async (ctx) => {
+        const today = new Date().toISOString().slice(0, 10);
+        const existing = await ctx.db
+            .query("dailyChallenge")
+            .withIndex("by_date", (q) => q.eq("date", today))
+            .unique();
+        if (existing) return;
+        await ctx.scheduler.runAfter(0, internal.challenges.fetchAndSetDailyChallenge, {});
     },
 });
 
