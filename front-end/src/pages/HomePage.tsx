@@ -28,6 +28,14 @@ export const HomePage = () => {
                     >
                         Random Game
                     </Button>
+                    <Button
+                        component={Link}
+                        to="/leaderboard"
+                        variant="outlined"
+                        sx={{ width: "fit-content" }}
+                    >
+                        🥇 Leaderboard
+                    </Button>
                 </Stack>
                 <Stack direction="row" gap={1} alignItems="center">
                     {isSignedIn ? (
