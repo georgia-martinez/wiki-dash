@@ -10,15 +10,25 @@ export const HomePage = () => {
     return (
         <Stack sx={{ px: 20, gap: 2, justifyContent: "center" }}>
             <Stack direction="row" justifyContent="space-between" alignItems="center">
-                <Button
-                    component={Link}
-                    to="/game"
-                    variant="outlined"
-                    color="primary"
-                    sx={{ width: "fit-content" }}
-                >
-                    Start Today's WikiDash
-                </Button>
+                <Stack direction="row" gap={1}>
+                    <Button
+                        component={Link}
+                        to="/game"
+                        variant="contained"
+                        color="primary"
+                        sx={{ width: "fit-content" }}
+                    >
+                        Start Today's WikiDash
+                    </Button>
+                    <Button
+                        component={Link}
+                        to="/game?mode=random"
+                        variant="outlined"
+                        sx={{ width: "fit-content" }}
+                    >
+                        Random Game
+                    </Button>
+                </Stack>
                 <Stack direction="row" gap={1} alignItems="center">
                     {isSignedIn ? (
                         <UserButton />
