@@ -70,7 +70,8 @@ services:
     volumes:
       - ./back-end:/app
     env_file:
-      - .env.local
+      - path: .env.local
+        required: true
     environment:
       - CONVEX_SELF_HOSTED_URL=http://backend:${PORT:-3210}
     command: sh -c "npm install && npx convex deploy"
@@ -86,11 +87,16 @@ services:
       args:
         - VITE_CLERK_PUBLISHABLE_KEY
         - VITE_CONVEX_URL=http://localhost:3210
+    env_file:
+      - path: .env.local
+        required: true
     ports:
       - "${FRONTEND_PORT:-5174}:80"
     depends_on:
       backend:
         condition: service_healthy
+      deploy-functions:
+        condition: service_completed_successfully
 
 volumes:
   data:

@@ -91,7 +91,7 @@ function Scoreboard({ sortBy, selectedDate }: { sortBy: SortBy; selectedDate?: s
               <TableRow>
                 <TableCell colSpan={4} align="center" sx={{ py: 4 }}>
                   <Typography color="text.secondary">
-                    {scores === undefined ? "Loading..." : "No scores yet. Be the first to play!"}
+                    {scores === undefined ? "Loading..." : "No scores yet"}
                   </Typography>
                 </TableCell>
               </TableRow>

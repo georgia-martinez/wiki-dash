@@ -16,3 +16,5 @@ services:
     depends_on:
       backend:
         condition: service_healthy
+      deploy-functions:
+        condition: service_completed_successfully
