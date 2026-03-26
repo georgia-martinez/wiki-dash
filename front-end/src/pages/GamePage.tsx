@@ -164,7 +164,7 @@ export const GamePage = () => {
                             {puzzle?.[1]}
                         </Typography>
                     </Stack>
-                    <Stack direction="row" gap={1}>
+                    <Stack direction="row" gap={2}>
                         {/* Links clicked */}
                         <Stack direction="row" gap={1}>
                             <Typography variant="h5">Links clicked:</Typography>
@@ -200,7 +200,7 @@ export const GamePage = () => {
                     {/* Reset button */}
                     <Stack direction="row" gap={1} alignItems="center">
                         <Typography variant="body2">
-                            NOTE: Resetting will not reset links clicked or time
+                            NOTE: Will reset links clicked but not time
                         </Typography>
                         <Button
                             variant="outlined"
@@ -210,6 +210,7 @@ export const GamePage = () => {
                                     setPageTitle(puzzle[0]);
                                     setLoading(true);
                                     setError(null);
+                                    setLinksClicked([]);
                                 }
                             }}
                         >

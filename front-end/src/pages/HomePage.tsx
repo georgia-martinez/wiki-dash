@@ -86,13 +86,13 @@ export const HomePage = () => {
                 </Box>
                 <Box component="ul" mt={-0.5}>
                     <Typography component="li" variant="body1">
-                        <Link to="/game">Start today's WikiDash</Link>
+                        <Link to="/game">🏁 Start today's WikiDash</Link>
                     </Typography>
                     <Typography component="li" variant="body1">
-                        <Link to="/game?mode=random">Play a random unranked game</Link>
+                        <Link to="/game?mode=random">🎲 Play a random unranked game</Link>
                     </Typography>
                     <Typography component="li" variant="body1">
-                        <Link to="/leaderboard">View the leaderboard</Link>
+                        <Link to="/leaderboard">🏅 View the leaderboard</Link>
                     </Typography>
                 </Box>
                 <Stack gap={1}>
@@ -184,7 +184,7 @@ export const HomePage = () => {
                 This project wouldn't be possible without{" "}
                 <ExternalLink href="https://en.wikipedia.org/wiki/Wikipedia">
                     Wikipedia
-                </ExternalLink>{" "}
+                </ExternalLink>
                 . Wikipedia is a free, nonprofit encyclopedia that anyone can edit. It is one of the
                 most visited websites in the world and is used by millions of people every day. If
                 you enjoy playing WikiDash, please consider{" "}
