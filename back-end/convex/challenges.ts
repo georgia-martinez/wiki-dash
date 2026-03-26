@@ -6,6 +6,25 @@ const WIKIMEDIA_API = "https://wikimedia.org/api/rest_v1";
 const MAX_TITLE_LENGTH = 20;
 const EXCLUDED_PREFIXES = ["Special:", "Wikipedia:", "Portal:"];
 const EXCLUDED_TITLES = new Set(["Main Page", "Special:Search", "Wikipedia:Contents"]);
+const NSFW_CATEGORIES = [
+    "Category:Pornography",
+    "Category:Pornographic films",
+    "Category:Pornographic film series",
+    "Category:Sexual fetishism",
+    "Category:Adult websites",
+    "Category:Sex industry",
+];
+
+async function isNSFW(title: string): Promise<boolean> {
+    const encoded = encodeURIComponent(title.replaceAll(" ", "_"));
+    const clcategories = NSFW_CATEGORIES.map(encodeURIComponent).join("|");
+    const url = `https://en.wikipedia.org/w/api.php?action=query&titles=${encoded}&prop=categories&cllimit=50&clcategories=${clcategories}&format=json`;
+    const res = await fetch(url);
+    if (!res.ok) return false;
+    const data = await res.json();
+    const pages = Object.values(data.query?.pages ?? {}) as { categories?: unknown[] }[];
+    return pages.some((p) => (p.categories?.length ?? 0) > 0);
+}
 
 export const getTodaysChallenge = query({
     args: {},
@@ -82,13 +101,19 @@ export const fetchAndSetDailyChallenge = internalAction({
 
         if (filtered.length < 2) throw new Error("Not enough popular articles");
 
-        const i = Math.floor(Math.random() * filtered.length);
-        let j = Math.floor(Math.random() * (filtered.length - 1));
+        const safeFiltered: string[] = [];
+        for (const title of filtered) {
+            if (!(await isNSFW(title))) safeFiltered.push(title);
+        }
+        if (safeFiltered.length < 2) throw new Error("Not enough safe articles");
+
+        const i = Math.floor(Math.random() * safeFiltered.length);
+        let j = Math.floor(Math.random() * (safeFiltered.length - 1));
         if (j >= i) j++;
 
         await ctx.runMutation(internal.challenges.setDailyChallenge, {
-            article1: filtered[i],
-            article2: filtered[j],
+            article1: safeFiltered[i],
+            article2: safeFiltered[j],
         });
     },
 });
