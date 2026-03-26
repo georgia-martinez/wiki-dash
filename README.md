@@ -14,6 +14,11 @@ WikiDash is a website where users compete in daily challenges to get from one ra
 | Containerization | Docker |
 | Hosting | Fly.io |
 
+## Prerequisites
+
+- [Node.js](https://nodejs.org/) (v18 or higher)
+- [Docker](https://www.docker.com/get-started/) (must be running before Step 4)
+
 ## Environment Setup
 
 ### Step 1: Clone the repository
@@ -24,18 +29,22 @@ git clone git@github.com:georgia-martinez/wiki-dash.git
 
 ### Step 2: Environment variables
 
-Copy `.env.example` and rename the copy to `.env.local`. You should see the following two variables:
+Copy `.env.example` and rename the copy to `.env.local`. You should see the following variables:
 
 ```
 VITE_CLERK_PUBLISHABLE_KEY=
 VITE_CONVEX_URL=http://127.0.0.1:3210
+CONVEX_SELF_HOSTED_URL=http://127.0.0.1:3210
+CONVEX_SELF_HOSTED_ADMIN_KEY=
 ```
 
-You can get the `VITE_CLERK_PUBLISHABLE_KEY` from the Clerk dashboard: https://dashboard.clerk.com/ under API Keys. You can leave the `VITE_CONVEX_URL` as is.
+- `VITE_CLERK_PUBLISHABLE_KEY`: Get this from the Clerk dashboard: https://dashboard.clerk.com/ under API Keys.
+- `VITE_CONVEX_URL` and `CONVEX_SELF_HOSTED_URL`: Leave as is for local development.
+- `CONVEX_SELF_HOSTED_ADMIN_KEY`: This will be generated in Step 5 below. You can leave it blank for now.
 
 ### Step 3: Install Docker
 
-Install Docker and make sure it is running before proceeding: https://www.docker.com/get-started/. 
+Make sure Docker is installed and running before proceeding: https://www.docker.com/get-started/.
 
 Then in the root directory, run the following command to login and follow the instructions:
 
@@ -51,25 +60,30 @@ Once you have your environment variables set and Docker running, start the Conve
 docker compose up
 ```
 
-Keep this process running while developing. It will watch for changes and automatically.
+Keep this process running while developing. It will watch for changes and automatically reload.
 
-The local database can be viewed at http://localhost:6791. This is where the local convex dashboard is running. You will need to generate a key to login:
+The local frontend can be viewed at http://localhost:5173/.
+
+### Step 5: Access the local database dashboard
+
+The local database can be viewed at http://localhost:6791. You will need to generate an admin key to login:
 
 ```
 docker compose --env-file .env.local exec backend ./generate_admin_key.sh
 ```
 
-Copy the key in it's entirety, including the prefix at the beginning.
+Copy the key in its entirety, including the prefix at the beginning.
 
-If you want to input data, you may either do so manually through the local database link, or by uploading the JSON file of prepared data. cd into 'back-end' and run the following commands:
+### Step 6: Import sample data (optional)
+
+If you want to input data, you may either do so manually through the local database dashboard, or by importing the prepared sample data. First install dependencies, then run the import commands:
 
 ```
-npx convex import --table scores sampleData.jsonl
+cd back-end
+npm install
+npx convex import --table scores sampledata.jsonl
 npx convex import --table dailyChallenge samplechallenge.jsonl
 ```
-
-To run the frontend locally, cd into 'front-end' and run 'npm run dev'
-The local frontend can be viewed at http://localhost:5173/.
 
 ## Development Workflow
 
