@@ -5,6 +5,22 @@ const bodyFont =
     '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
 
 export const theme = createTheme({
+    components: {
+        MuiCssBaseline: {
+            styleOverrides: {
+                a: {
+                    color: "#3366cc",
+                    textDecoration: "none",
+                    "&:visited": {
+                        color: "#6e4b7b",
+                    },
+                    "&:hover": {
+                        textDecoration: "underline",
+                    },
+                },
+            },
+        },
+    },
     typography: {
         h1: {
             fontFamily: wikipediaHeadingFont,

@@ -156,11 +156,10 @@ export const GamePage = () => {
                 <Stack direction="row" justifyContent="space-between" gap={1}>
                     {/* Get from article1 to article2 */}
                     <Stack direction="row" gap={1}>
-                        <Typography variant="h5">Get from</Typography>
                         <Typography variant="h5" sx={{ fontWeight: "bold" }}>
                             {puzzle?.[0]}
                         </Typography>
-                        <Typography variant="h5">to</Typography>
+                        <Typography variant="h5">➡️</Typography>
                         <Typography variant="h5" sx={{ fontWeight: "bold" }}>
                             {puzzle?.[1]}
                         </Typography>
@@ -176,7 +175,15 @@ export const GamePage = () => {
                         {/* Timer */}
                         <Stack direction="row" gap={1}>
                             <Typography variant="h5">Time:</Typography>
-                            <Typography component="span" variant="h5" sx={{ fontWeight: "bold", fontVariantNumeric: "tabular-nums", minWidth: "4ch" }}>
+                            <Typography
+                                component="span"
+                                variant="h5"
+                                sx={{
+                                    fontWeight: "bold",
+                                    fontVariantNumeric: "tabular-nums",
+                                    minWidth: "4ch",
+                                }}
+                            >
                                 <span ref={timerDisplayRef}>0:00</span>
                             </Typography>
                         </Stack>
@@ -225,7 +232,9 @@ export const GamePage = () => {
                         </Box>
                     )}
                     {!challengeLoading && !dailyChallenge && (
-                        <Alert severity="warning">No challenge set for today yet. Check back soon!</Alert>
+                        <Alert severity="warning">
+                            No challenge set for today yet. Check back soon!
+                        </Alert>
                     )}
                     {html && (
                         <Box

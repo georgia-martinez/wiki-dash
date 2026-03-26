@@ -38,7 +38,6 @@ export const PhotoViewer = ({ title, image, caption, infoLines }: Props) => {
                     component="div"
                     sx={{
                         fontWeight: "bold",
-                        fontStyle: "italic",
                         textAlign: "center",
                     }}
                 >
@@ -100,15 +99,17 @@ export const PhotoViewer = ({ title, image, caption, infoLines }: Props) => {
                                         }}
                                     >
                                         {href ? (
-                                            <Link
-                                                href={href}
-                                                target="_blank"
-                                                rel="noopener noreferrer"
-                                                sx={{ fontSize: "inherit" }}
-                                            >
-                                                {text}
-                                                <span aria-hidden>↗</span>
-                                            </Link>
+                                            <Typography variant="body2">
+                                                <Link
+                                                    href={href}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    sx={{ textDecoration: "none", "&:hover": { textDecoration: "underline" } }}
+                                                >
+                                                    {text}
+                                                    <span aria-hidden>↗</span>
+                                                </Link>
+                                            </Typography>
                                         ) : (
                                             <Typography variant="body2">{text}</Typography>
                                         )}
