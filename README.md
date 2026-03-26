@@ -52,9 +52,20 @@ Then in the root directory, run the following command to login and follow the in
 docker login
 ```
 
-### Step 4: Run the project
+### Step 4: Generate the admin key
 
-Once you have your environment variables set and Docker running, start the Convex backend and frontend from the root directory:
+Start just the backend service, then generate an admin key:
+
+```
+docker compose up backend -d --no-deps
+docker compose exec backend ./generate_admin_key.sh
+```
+
+Copy the key in its entirety, including the prefix at the beginning. Paste it as the `CONVEX_SELF_HOSTED_ADMIN_KEY` value in your `.env.local` file.
+
+### Step 5: Run the project
+
+Once you have your environment variables set and Docker running, start everything from the root directory:
 
 ```
 docker compose up
@@ -62,17 +73,8 @@ docker compose up
 
 Keep this process running while developing. It will watch for changes and automatically reload.
 
-The local frontend can be viewed at http://localhost:5173/.
-
-### Step 5: Access the local database dashboard
-
-The local database can be viewed at http://localhost:6791. You will need to generate an admin key to login:
-
-```
-docker compose --env-file .env.local exec backend ./generate_admin_key.sh
-```
-
-Copy the key in its entirety, including the prefix at the beginning.
+- Local frontend: http://localhost:5173/
+- Local database dashboard: http://localhost:6791 (use the admin key from Step 4 to login)
 
 ### Step 6: Import sample data (optional)
 
