@@ -64,6 +64,21 @@ services:
       backend:
         condition: service_healthy
 
+  deploy-functions:
+    image: node:20-alpine
+    working_dir: /app
+    volumes:
+      - ./back-end:/app
+    env_file:
+      - .env.local
+    environment:
+      - CONVEX_SELF_HOSTED_URL=http://backend:${PORT:-3210}
+    command: sh -c "npm install && npx convex deploy"
+    depends_on:
+      backend:
+        condition: service_healthy
+    restart: "no"
+
   frontend:
     build:
       context: .
