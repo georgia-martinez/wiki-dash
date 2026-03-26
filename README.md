@@ -56,17 +56,20 @@ Keep this process running while developing. It will watch for changes and automa
 The local database can be viewed at http://localhost:6791. This is where the local convex dashboard is running. You will need to generate a key to login:
 
 ```
-docker compose exec backend ./generate_admin_key.sh
+docker compose --env-file .env.local exec backend ./generate_admin_key.sh
 ```
 
 Copy the key in it's entirety, including the prefix at the beginning.
 
-If you want to input data, you may either do so manually through the local database link, or by uploading the JSON file of prepared data by running the following command:
+If you want to input data, you may either do so manually through the local database link, or by uploading the JSON file of prepared data. cd into 'back-end' and run the following commands:
 
 ```
 npx convex import --table scores sampleData.jsonl
 npx convex import --table dailyChallenge samplechallenge.jsonl
 ```
+
+To run the frontend locally, cd into 'front-end' and run 'npm run dev'
+The local frontend can be viewed at http://localhost:5173/.
 
 ## Development Workflow
 
