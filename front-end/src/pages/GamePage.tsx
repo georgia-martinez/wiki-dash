@@ -57,14 +57,19 @@ export const GamePage = () => {
         });
     }, [challengeLoading, dailyChallenge, ensureTodaysChallenge]);
     const [linksClicked, setLinksClicked] = useState<string[]>([]);
-    const [elapsedSeconds, setElapsedSeconds] = useState(0);
+    const elapsedSecondsRef = useRef(0);
+    const timerDisplayRef = useRef<HTMLSpanElement>(null);
     const [won, setWon] = useState(false);
     const [showNonWikiAlert, setShowNonWikiAlert] = useState(false);
 
     useEffect(() => {
         if (loading || won) return;
         const id = setInterval(() => {
-            setElapsedSeconds((s) => s + 1);
+            elapsedSecondsRef.current += 1;
+            const s = elapsedSecondsRef.current;
+            if (timerDisplayRef.current) {
+                timerDisplayRef.current.textContent = `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`;
+            }
         }, 1000);
         return () => clearInterval(id);
     }, [loading, won]);
@@ -127,24 +132,22 @@ export const GamePage = () => {
     }, [pageTitle]);
 
     return (
-        <Stack spacing={2}>
+        <Box sx={{ height: "100vh", display: "flex", flexDirection: "column", overflow: "hidden" }}>
             <WinModal
                 open={won}
                 startArticle={puzzle?.[0] ?? ""}
                 endArticle={puzzle?.[1] ?? ""}
                 linksClicked={linksClicked.length}
-                elapsedSeconds={elapsedSeconds}
+                elapsedSeconds={elapsedSecondsRef.current}
                 isRandom={isRandom}
             />
-            {/* Sticky header */}
+            {/* Header */}
             <Stack
                 sx={{
                     gap: 1,
-                    position: "sticky",
-                    top: 0,
-                    zIndex: 1,
                     backgroundColor: "background.paper",
                     py: 1,
+                    px: 4,
                     flexShrink: 0,
                     borderBottom: "1px solid",
                     borderColor: "divider",
@@ -173,9 +176,8 @@ export const GamePage = () => {
                         {/* Timer */}
                         <Stack direction="row" gap={1}>
                             <Typography variant="h5">Time:</Typography>
-                            <Typography variant="h5" sx={{ fontWeight: "bold", fontVariantNumeric: "tabular-nums", minWidth: "4ch" }}>
-                                {Math.floor(elapsedSeconds / 60)}:
-                                {String(elapsedSeconds % 60).padStart(2, "0")}
+                            <Typography component="span" variant="h5" sx={{ fontWeight: "bold", fontVariantNumeric: "tabular-nums", minWidth: "4ch" }}>
+                                <span ref={timerDisplayRef}>0:00</span>
                             </Typography>
                         </Stack>
                     </Stack>
@@ -209,42 +211,47 @@ export const GamePage = () => {
                     </Stack>
                 </Stack>
             </Stack>
-            {error && (
-                <Alert severity="error" onClose={() => setError(null)}>
-                    {error}
-                </Alert>
-            )}
-            {(challengeLoading || loading) && (
-                <Box display="flex" justifyContent="center" p={4}>
-                    <CircularProgress />
-                </Box>
-            )}
-            {!challengeLoading && !dailyChallenge && (
-                <Alert severity="warning">No challenge set for today yet. Check back soon!</Alert>
-            )}
-            {html && (
-                <Box
-                    display={loading ? "none" : "block"}
-                    className="wiki-content"
-                    onClick={handleWikiContentClick}
-                    sx={{
-                        border: 1,
-                        borderColor: "divider",
-                        borderRadius: 1,
-                        p: 2,
-                        "& a": { color: "primary.main", cursor: "pointer" },
-                    }}
-                >
-                    <div
-                        dangerouslySetInnerHTML={{ __html: html }}
-                        style={{
-                            fontFamily: "sans-serif",
-                            fontSize: "0.95rem",
-                            lineHeight: 1.6,
-                        }}
-                    />
-                </Box>
-            )}
+            {/* Scrollable content area */}
+            <Box sx={{ flex: 1, overflowY: "auto", px: 4, py: 2 }}>
+                <Stack spacing={2}>
+                    {error && (
+                        <Alert severity="error" onClose={() => setError(null)}>
+                            {error}
+                        </Alert>
+                    )}
+                    {(challengeLoading || loading) && (
+                        <Box display="flex" justifyContent="center" p={4}>
+                            <CircularProgress />
+                        </Box>
+                    )}
+                    {!challengeLoading && !dailyChallenge && (
+                        <Alert severity="warning">No challenge set for today yet. Check back soon!</Alert>
+                    )}
+                    {html && (
+                        <Box
+                            display={loading ? "none" : "block"}
+                            className="wiki-content"
+                            onClick={handleWikiContentClick}
+                            sx={{
+                                border: 1,
+                                borderColor: "divider",
+                                borderRadius: 1,
+                                p: 2,
+                                "& a": { color: "primary.main", cursor: "pointer" },
+                            }}
+                        >
+                            <div
+                                dangerouslySetInnerHTML={{ __html: html }}
+                                style={{
+                                    fontFamily: "sans-serif",
+                                    fontSize: "0.95rem",
+                                    lineHeight: 1.6,
+                                }}
+                            />
+                        </Box>
+                    )}
+                </Stack>
+            </Box>
             <Snackbar
                 open={showNonWikiAlert}
                 autoHideDuration={3000}
@@ -255,6 +262,6 @@ export const GamePage = () => {
                     You can only follow links to other Wikipedia articles!
                 </Alert>
             </Snackbar>
-        </Stack>
+        </Box>
     );
 };

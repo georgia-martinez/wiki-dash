@@ -6,16 +6,10 @@ import { LeaderboardPage } from "./pages/LeaderboardPage";
 
 export const App = () => {
     return (
-        <Stack
-            sx={{
-                p: 4,
-            }}
-        >
-            <Routes>
-                <Route path="/" element={<HomePage />} />
-                <Route path="/game" element={<GamePage />} />
-                <Route path="/leaderboard" element={<LeaderboardPage />} />
-            </Routes>
-        </Stack>
+        <Routes>
+            <Route path="/" element={<Stack sx={{ p: 4 }}><HomePage /></Stack>} />
+            <Route path="/game" element={<GamePage />} />
+            <Route path="/leaderboard" element={<Stack sx={{ p: 4 }}><LeaderboardPage /></Stack>} />
+        </Routes>
     );
 };
