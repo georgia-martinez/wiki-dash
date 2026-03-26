@@ -82,7 +82,7 @@ function Scoreboard({ sortBy, selectedDate }: { sortBy: SortBy; selectedDate?: s
                 Pages
               </TableCell>
               <TableCell align="right" sx={{ fontWeight: 700, color: "text.secondary", fontSize: "0.75rem", letterSpacing: 1, textTransform: "uppercase" }}>
-                Time (s)
+                Time
               </TableCell>
             </TableRow>
           </TableHead>
@@ -118,7 +118,9 @@ function Scoreboard({ sortBy, selectedDate }: { sortBy: SortBy; selectedDate?: s
                       <Typography>{pagesClicked}</Typography>
                     </TableCell>
                     <TableCell align="right">
-                      <Typography color="text.secondary">{timeSpent}</Typography>
+                      <Typography color="text.secondary">
+                        {`${Math.floor(timeSpent / 60)}:${String(timeSpent % 60).padStart(2, "0")}`}
+                      </Typography>
                     </TableCell>
                   </TableRow>
                 );
