@@ -1,0 +1,18 @@
+FROM node:alpine
+
+WORKDIR /app
+
+COPY back-end/package*.json ./back-end/
+RUN cd back-end && npm ci
+
+COPY front-end/package*.json ./front-end/
+RUN cd front-end && npm ci
+
+COPY back-end/ ./back-end/
+COPY front-end/ ./front-end/
+
+WORKDIR /app/front-end
+
+EXPOSE 5173
+
+CMD ["npm", "run", "dev"]

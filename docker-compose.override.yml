@@ -1,0 +1,18 @@
+services:
+  frontend:
+    build:
+      context: .
+      dockerfile: front-end/Dockerfile.dev
+    ports:
+      - "${FRONTEND_PORT:-5173}:5173"
+    environment:
+      - VITE_CLERK_PUBLISHABLE_KEY=${VITE_CLERK_PUBLISHABLE_KEY}
+      - VITE_CONVEX_URL=${VITE_CONVEX_URL:-http://localhost:3210}
+    volumes:
+      - ./front-end:/app/front-end
+      - ./back-end:/app/back-end
+      - /app/front-end/node_modules
+      - /app/back-end/node_modules
+    depends_on:
+      backend:
+        condition: service_healthy
