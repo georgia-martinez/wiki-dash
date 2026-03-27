@@ -20,3 +20,11 @@ export const get = query({
     return await ctx.db.query("scores").collect();
   },
 });
+
+export const clearAll = mutation({
+    args: {},
+    handler: async (ctx) => {
+        const all = await ctx.db.query("scores").collect();
+        await Promise.all(all.map((s) => ctx.db.delete(s._id)));
+    },
+});
