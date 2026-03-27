@@ -14,11 +14,6 @@ WikiDash is a website where users compete in daily challenges to get from one ra
 | Containerization | Docker |
 | Hosting | Fly.io |
 
-## Prerequisites
-
-- [Node.js](https://nodejs.org/) (v18 or higher)
-- [Docker](https://www.docker.com/get-started/) (must be running before Step 4)
-
 ## Environment Setup
 
 ### Step 1: Clone the repository
