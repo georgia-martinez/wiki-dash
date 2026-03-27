@@ -164,6 +164,7 @@ export const HomePage = () => {
                 </Box>
             </Box>
             <Header title="Development" />
+            <Typography variant="body1">Oh naur I left in extraneous text I guess someone will need to open a PR and delete this during the presentation ;-)</Typography>
             <Typography variant="body1">
                 WikiDash was developed by Georgia Martinez, Maya Malavasi, and Sydney Cole for the
                 2026{" "}
