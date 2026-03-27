@@ -77,7 +77,7 @@ export const HomePage = () => {
                                 info: [
                                     {
                                         label: "github.com/georgia-martinez/wiki-dash",
-                                        link: "github.com/georgia-martinez/wiki-dash",
+                                        link: "https://github.com/georgia-martinez/wiki-dash",
                                     },
                                 ],
                             },
