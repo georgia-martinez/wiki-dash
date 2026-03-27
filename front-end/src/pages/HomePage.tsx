@@ -1,12 +1,15 @@
 import { SignInButton, UserButton, useUser } from "@clerk/react";
 import { Box, Stack, Typography } from "@mui/material";
+import { useQuery } from "convex/react";
 import { Link } from "react-router-dom";
+import { api } from "../../../back-end/convex/_generated/api";
 import { ExternalLink } from "../components/ExternalLink";
 import { Header } from "../components/Header";
 import { PhotoViewer } from "../components/PhotoViewer";
 
 export const HomePage = () => {
     const { isSignedIn } = useUser();
+    const todaysChallenge = useQuery(api.challenges.getTodaysChallenge);
 
     return (
         <Stack sx={{ px: 30, gap: 2, justifyContent: "center" }}>
@@ -84,17 +87,6 @@ export const HomePage = () => {
                         ]}
                     />
                 </Box>
-                <Box component="ul" mt={-0.5}>
-                    <Typography component="li" variant="body1">
-                        <Link to="/game">🏁 Start today's WikiDash</Link>
-                    </Typography>
-                    <Typography component="li" variant="body1">
-                        <Link to="/game?mode=random" onClick={() => sessionStorage.setItem("wikiDash_randomFresh", "true")}>🎲 Play a random unranked game</Link>
-                    </Typography>
-                    <Typography component="li" variant="body1">
-                        <Link to="/leaderboard">🏅 View the leaderboard</Link>
-                    </Typography>
-                </Box>
                 <Stack gap={1}>
                     <Typography variant="body1">
                         WikiDash is a 2026{" "}
@@ -116,6 +108,63 @@ export const HomePage = () => {
                         .
                     </Typography>
                 </Stack>
+                <Box
+                    mt={2}
+                    sx={{
+                        border: "1px solid",
+                        borderColor: "grey.300",
+                        bgcolor: "#eaf0fb",
+                        p: 2,
+                        width: "fit-content",
+                    }}
+                >
+                    <Typography
+                        variant="overline"
+                        fontWeight={700}
+                        sx={{ display: "block", mb: 1, color: "text.primary", lineHeight: 1 }}
+                    >
+                        Start Playing
+                    </Typography>
+                    <Stack gap={1}>
+                        {[
+                            { to: "/game", label: "Start today's WikiDash", primary: true },
+                            {
+                                to: "/game?mode=random",
+                                label: "Play a random unranked game",
+                                onClick: () =>
+                                    sessionStorage.setItem("wikiDash_randomFresh", "true"),
+                            },
+                            { to: "/leaderboard", label: "View the leaderboard" },
+                        ].map(({ to, label, onClick, primary }) => (
+                            <Link
+                                key={to}
+                                to={to}
+                                onClick={onClick}
+                                style={{ textDecoration: "none" }}
+                            >
+                                <Box
+                                    sx={{
+                                        display: "flex",
+                                        alignItems: "center",
+                                        justifyContent: "center",
+                                        border: "1px solid",
+                                        borderColor: primary ? "#3366cc" : "grey.300",
+                                        px: 3,
+                                        py: 1,
+                                        bgcolor: primary ? "#3366cc" : "white",
+                                        color: primary ? "white" : "#3366cc",
+                                        typography: "body1",
+                                        width: 320,
+                                        "&:hover": { bgcolor: primary ? "#2a55aa" : "#f0f4ff" },
+                                        transition: "background-color 0.15s",
+                                    }}
+                                >
+                                    {label}
+                                </Box>
+                            </Link>
+                        ))}
+                    </Stack>
+                </Box>
             </Box>
             <Header title="Development" />
             <Typography variant="body1">

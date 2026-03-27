@@ -1,11 +1,11 @@
-import { Box, Button, Dialog, DialogContent, Stack, TextField, Typography } from "@mui/material";
-import { ArticleTag } from "./ArticleTag";
 import { SignInButton, useUser } from "@clerk/react";
+import { Box, Button, Dialog, DialogContent, Stack, TextField, Typography } from "@mui/material";
+import { useMutation } from "convex/react";
 import { useState } from "react";
 import Confetti from "react-confetti";
 import { useNavigate } from "react-router-dom";
-import { useMutation } from "convex/react";
 import { api } from "../../../back-end/convex/_generated/api";
+import { ArticleTag } from "./ArticleTag";
 
 interface WinModalProps {
     open: boolean;
@@ -17,7 +17,15 @@ interface WinModalProps {
     path?: string[];
 }
 
-export const WinModal = ({ open, startArticle, endArticle, linksClicked, elapsedSeconds, isRandom, path }: WinModalProps) => {
+export const WinModal = ({
+    open,
+    startArticle,
+    endArticle,
+    linksClicked,
+    elapsedSeconds,
+    isRandom,
+    path,
+}: WinModalProps) => {
     const [name, setName] = useState("");
     const [submitted, setSubmitted] = useState(false);
     const navigate = useNavigate();
@@ -28,7 +36,13 @@ export const WinModal = ({ open, startArticle, endArticle, linksClicked, elapsed
     const seconds = String(elapsedSeconds % 60).padStart(2, "0");
 
     const handleSubmit = (username: string) => {
-        submitScore({ username, pagesClicked: linksClicked, timeSpent: elapsedSeconds, date: new Date().toISOString().split("T")[0], path });
+        submitScore({
+            username,
+            pagesClicked: linksClicked,
+            timeSpent: elapsedSeconds,
+            date: new Date().toISOString().split("T")[0],
+            path,
+        });
         setSubmitted(true);
     };
 
@@ -58,7 +72,9 @@ export const WinModal = ({ open, startArticle, endArticle, linksClicked, elapsed
             >
                 <DialogContent>
                     <Stack spacing={3} alignItems="center">
-                        <Typography fontSize={48} lineHeight={1}>🏆</Typography>
+                        <Typography fontSize={48} lineHeight={1}>
+                            🏆
+                        </Typography>
                         <Typography variant="h3" fontWeight="bold" textAlign="center">
                             You won!
                         </Typography>
@@ -103,10 +119,14 @@ export const WinModal = ({ open, startArticle, endArticle, linksClicked, elapsed
                                 </Typography>
                             </Box>
                         </Stack>
-
                         {!isRandom &&
                             (submitted ? (
-                                <Typography variant="body1" color="success.main" fontWeight="bold" textAlign="center">
+                                <Typography
+                                    variant="body1"
+                                    color="success.main"
+                                    fontWeight="bold"
+                                    textAlign="center"
+                                >
                                     Thanks for playing {isSignedIn ? displayName : name}!
                                 </Typography>
                             ) : isSignedIn ? (
@@ -149,7 +169,7 @@ export const WinModal = ({ open, startArticle, endArticle, linksClicked, elapsed
                                             }
                                         />
                                         <Button
-                                            variant="outlined"
+                                            variant="contained"
                                             onClick={() => handleSubmit(name.trim())}
                                             disabled={!name.trim()}
                                         >
@@ -158,21 +178,16 @@ export const WinModal = ({ open, startArticle, endArticle, linksClicked, elapsed
                                     </Stack>
                                 </Stack>
                             ))}
-
                         {!isRandom && (
                             <Button
-                                variant="contained"
+                                variant="outlined"
                                 onClick={() => navigate("/leaderboard")}
                                 fullWidth
                             >
                                 View leaderboard
                             </Button>
                         )}
-                        <Button
-                            variant="outlined"
-                            onClick={() => navigate("/")}
-                            fullWidth
-                        >
+                        <Button variant="outlined" onClick={() => navigate("/")} fullWidth>
                             Back to home
                         </Button>
                     </Stack>
