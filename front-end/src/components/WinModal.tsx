@@ -181,13 +181,13 @@ export const WinModal = ({
                         {!isRandom && (
                             <Button
                                 variant="outlined"
-                                onClick={() => navigate("/leaderboard")}
+                                onClick={() => navigate("/leaderboard", { replace: true })}
                                 fullWidth
                             >
                                 View leaderboard
                             </Button>
                         )}
-                        <Button variant="outlined" onClick={() => navigate("/")} fullWidth>
+                        <Button variant="outlined" onClick={() => navigate("/", { replace: true })} fullWidth>
                             Back to home
                         </Button>
                     </Stack>
