@@ -83,7 +83,7 @@ export const LeaderboardPage = () => {
                         Today
                     </Button>
                 </Stack>
-                <ChallengeInfo date={selectedDate} />
+                {!showBlur && <ChallengeInfo date={selectedDate} />}
             </Stack>
             <ErrorBoundary message="Error loading leaderboard. Please try again later.">
                 <Box sx={{ position: "relative", flex: 1, minHeight: 0, overflow: "hidden" }}>
