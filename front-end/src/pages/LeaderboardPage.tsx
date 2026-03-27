@@ -1,4 +1,4 @@
-import { Box, Button, Stack, TextField, Typography } from "@mui/material";
+import { Box, Button, Paper, Stack, TextField, Typography } from "@mui/material";
 import { useQuery } from "convex/react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -27,11 +27,21 @@ const ChallengeInfo = ({ date }: { date: string }) => {
     );
 };
 
+function hasCompletedDailyChallenge(): boolean {
+    try {
+        return localStorage.getItem("wikiDash_daily_completed") === new Date().toISOString().split("T")[0];
+    } catch {
+        return false;
+    }
+}
+
 export const LeaderboardPage = () => {
     const [sortBy, setSortBy] = useState<SortBy>("time");
     const today = new Date().toISOString().split("T")[0];
     const [selectedDate, setSelectedDate] = useState<string>(today);
     const navigate = useNavigate();
+    const isToday = selectedDate === today;
+    const showBlur = isToday && !hasCompletedDailyChallenge();
 
     return (
         <Stack sx={{ position: "fixed", inset: 0, overflow: "hidden", pt: 8, mx: "auto", width: "100%", maxWidth: 640, px: { xs: 2, sm: 3 } }}>
@@ -76,9 +86,60 @@ export const LeaderboardPage = () => {
                 <ChallengeInfo date={selectedDate} />
             </Stack>
             <ErrorBoundary message="Error loading leaderboard. Please try again later.">
-                <Stack alignItems="center" sx={{ width: "100%" }}>
-                    <Scoreboard sortBy={sortBy} selectedDate={selectedDate} />
-                </Stack>
+                <Box sx={{ position: "relative", flex: 1, minHeight: 0, overflow: "hidden" }}>
+                    <Stack
+                        alignItems="center"
+                        sx={{
+                            width: "100%",
+                            height: "100%",
+                            overflow: "auto",
+                            ...(showBlur && { filter: "blur(8px)", pointerEvents: "none", userSelect: "none" }),
+                        }}
+                    >
+                        <Scoreboard sortBy={sortBy} selectedDate={selectedDate} />
+                    </Stack>
+                    {showBlur && (
+                        <Box
+                            sx={{
+                                position: "absolute",
+                                inset: 0,
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "center",
+                                zIndex: 10,
+                            }}
+                        >
+                            <Paper
+                                elevation={6}
+                                sx={{
+                                    p: 4,
+                                    borderRadius: 4,
+                                    textAlign: "center",
+                                    maxWidth: 400,
+                                    mx: 2,
+                                }}
+                            >
+                                <Typography fontSize={48} lineHeight={1} mb={2}>
+                                    🔒
+                                </Typography>
+                                <Typography variant="h5" fontWeight="bold" mb={1}>
+                                    Play today's challenge first!
+                                </Typography>
+                                <Typography variant="body1" color="text.secondary" mb={3}>
+                                    Complete today's daily challenge to unlock the leaderboard for today.
+                                </Typography>
+                                <Button
+                                    variant="contained"
+                                    size="large"
+                                    fullWidth
+                                    onClick={() => navigate("/game")}
+                                >
+                                    Play Now
+                                </Button>
+                            </Paper>
+                        </Box>
+                    )}
+                </Box>
             </ErrorBoundary>
         </Stack>
     );
