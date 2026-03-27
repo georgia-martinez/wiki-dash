@@ -71,15 +71,23 @@ Keep this process running while developing. It will watch for changes and automa
 - Local frontend: http://localhost:5173/
 - Local database dashboard: http://localhost:6791 (use the admin key from Step 4 to login)
 
-### Step 6: Import sample data (optional)
+## Setting sample data
 
-If you want to input data, you may either do so manually through the local database dashboard, or by importing the prepared sample data. First install dependencies, then run the import commands:
+When running the project locally, a challenge should be automatically generated. But if you want to populate the challenge and leaderboard data directly without playing the game, you can import sample data directly.
+
+First, make sure the backend is running in a separate terminal if it isn't already
 
 ```
-cd back-end
-npx convex import --table scores sampledata.jsonl
-npx convex import --table dailyChallenge samplechallenge.jsonl
+docker compose up
 ```
+
+Then run the bash script from the root directory which will clear all of the existing data and replace it with the sample data
+
+```
+./back-end/import-sample-data.sh
+```
+
+To set your own sample data, modify `sample-challenge.jsonl` and `sample-leaderboard.jsonl`.
 
 ## Development Workflow
 
