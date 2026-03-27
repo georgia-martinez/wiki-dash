@@ -3,7 +3,7 @@ import { useMutation, useQuery } from "convex/react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { api } from "../../../back-end/convex/_generated/api";
-import { clearPendingWin, loadPendingWin, WinModal } from "../components/WinModal";
+import { loadPendingWin, WinModal } from "../components/WinModal";
 import { fetchWikiPage, getRandomWikiPages, getTitleFromWikiHref } from "../utils/mediaWikiApi";
 
 interface GameCache {
