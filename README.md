@@ -40,7 +40,7 @@ CONVEX_SELF_HOSTED_ADMIN_KEY=
 
 - `VITE_CLERK_PUBLISHABLE_KEY`: Get this from the Clerk dashboard: https://dashboard.clerk.com/ under API Keys.
 - `VITE_CONVEX_URL` and `CONVEX_SELF_HOSTED_URL`: Leave as is for local development.
-- `CONVEX_SELF_HOSTED_ADMIN_KEY`: This will be generated in Step 5 below. You can leave it blank for now.
+- `CONVEX_SELF_HOSTED_ADMIN_KEY`: This will be generated in Step 4 below. You can leave it blank for now.
 
 ### Step 3: Install Docker
 
