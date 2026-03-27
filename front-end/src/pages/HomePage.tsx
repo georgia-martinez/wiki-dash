@@ -89,7 +89,7 @@ export const HomePage = () => {
                         <Link to="/game">🏁 Start today's WikiDash</Link>
                     </Typography>
                     <Typography component="li" variant="body1">
-                        <Link to="/game?mode=random">🎲 Play a random unranked game</Link>
+                        <Link to="/game?mode=random" onClick={() => sessionStorage.setItem("wikiDash_randomFresh", "true")}>🎲 Play a random unranked game</Link>
                     </Typography>
                     <Typography component="li" variant="body1">
                         <Link to="/leaderboard">🏅 View the leaderboard</Link>

@@ -6,18 +6,72 @@ import { api } from "../../../back-end/convex/_generated/api";
 import { WinModal } from "../components/WinModal";
 import { fetchWikiPage, getRandomWikiPages, getTitleFromWikiHref } from "../utils/mediaWikiApi";
 
+interface GameCache {
+    pageTitle: string;
+    linksClicked: string[];
+    date?: string;
+    puzzle?: [string, string];
+}
+
+function cacheKey(isRandom: boolean) {
+    return isRandom ? "wikiDash_random" : "wikiDash_daily";
+}
+
+function readCache(isRandom: boolean): (GameCache & { elapsedSeconds: number }) | null {
+    try {
+        const raw = localStorage.getItem(cacheKey(isRandom));
+        if (!raw) return null;
+        const data: GameCache = JSON.parse(raw);
+        if (!isRandom && data.date !== new Date().toISOString().split("T")[0]) return null;
+        const elapsed = parseInt(localStorage.getItem(cacheKey(isRandom) + "_elapsed") ?? "0", 10) || 0;
+        return { ...data, elapsedSeconds: elapsed };
+    } catch {
+        return null;
+    }
+}
+
+function saveCache(isRandom: boolean, data: GameCache) {
+    try {
+        localStorage.setItem(cacheKey(isRandom), JSON.stringify(data));
+    } catch {}
+}
+
+function saveElapsed(isRandom: boolean, seconds: number) {
+    try {
+        localStorage.setItem(cacheKey(isRandom) + "_elapsed", String(seconds));
+    } catch {}
+}
+
+function clearCache(isRandom: boolean) {
+    localStorage.removeItem(cacheKey(isRandom));
+    localStorage.removeItem(cacheKey(isRandom) + "_elapsed");
+}
+
 export const GamePage = () => {
     const [searchParams] = useSearchParams();
     const isRandom = searchParams.get("mode") === "random";
 
+    // Read cache once on mount. For random mode, skip if the user explicitly started a new game.
+    const [cachedState] = useState<(GameCache & { elapsedSeconds: number }) | null>(() => {
+        if (isRandom && sessionStorage.getItem("wikiDash_randomFresh") === "true") {
+            sessionStorage.removeItem("wikiDash_randomFresh");
+            clearCache(true);
+            return null;
+        }
+        return readCache(isRandom);
+    });
+
     const dailyChallenge = useQuery(api.challenges.getTodaysChallenge);
     const ensureTodaysChallenge = useMutation(api.challenges.ensureTodaysChallenge);
     const ensureKickSent = useRef(false);
-    const [randomPuzzle, setRandomPuzzle] = useState<[string, string] | null>(null);
-    const [randomLoading, setRandomLoading] = useState(isRandom);
+    const [randomPuzzle, setRandomPuzzle] = useState<[string, string] | null>(
+        cachedState?.puzzle ?? null
+    );
+    const [randomLoading, setRandomLoading] = useState(isRandom && !cachedState?.puzzle);
 
     useEffect(() => {
         if (!isRandom) return;
+        if (randomPuzzle) return; // already restored from cache
         getRandomWikiPages()
             .then((pages) => {
                 setRandomPuzzle(pages);
@@ -32,7 +86,7 @@ export const GamePage = () => {
         ? randomPuzzle
         : dailyChallenge ? [dailyChallenge.article1, dailyChallenge.article2] : null;
 
-    const [pageTitle, setPageTitle] = useState("");
+    const [pageTitle, setPageTitle] = useState(cachedState?.pageTitle ?? "");
     const article2 = puzzle?.[1] ?? "";
     const [html, setHtml] = useState<string | null>(null);
     const [loading, setLoading] = useState(true);
@@ -52,13 +106,21 @@ export const GamePage = () => {
         ensureKickSent.current = true;
         void ensureTodaysChallenge().catch(() => {});
     }, [dailyChallenge, ensureTodaysChallenge]);
-    
-    const [linksClicked, setLinksClicked] = useState<string[]>([]);
-    const elapsedSecondsRef = useRef(0);
+
+    const [linksClicked, setLinksClicked] = useState<string[]>(cachedState?.linksClicked ?? []);
+    const elapsedSecondsRef = useRef(cachedState?.elapsedSeconds ?? 0);
     const timerDisplayRef = useRef<HTMLSpanElement>(null);
     const [won, setWon] = useState(false);
     const [elapsedSeconds, setElapsedSeconds] = useState(0);
     const [showNonWikiAlert, setShowNonWikiAlert] = useState(false);
+
+    // Restore timer display from cache after first render
+    useEffect(() => {
+        const s = elapsedSecondsRef.current;
+        if (s > 0 && timerDisplayRef.current) {
+            timerDisplayRef.current.textContent = `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`;
+        }
+    }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
     useEffect(() => {
         if (loading || won) return;
@@ -68,16 +130,29 @@ export const GamePage = () => {
             if (timerDisplayRef.current) {
                 timerDisplayRef.current.textContent = `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`;
             }
+            saveElapsed(isRandom, s);
         }, 1000);
         return () => clearInterval(id);
-    }, [loading, won]);
+    }, [loading, won]); // eslint-disable-line react-hooks/exhaustive-deps
 
     useEffect(() => {
         if (article2 && pageTitle === article2) {
             setElapsedSeconds(elapsedSecondsRef.current);
             setWon(true);
+            clearCache(isRandom);
         }
-    }, [pageTitle, article2]);
+    }, [pageTitle, article2]); // eslint-disable-line react-hooks/exhaustive-deps
+
+    // Persist game state whenever the current article or path changes
+    useEffect(() => {
+        if (!pageTitle || won) return;
+        saveCache(isRandom, {
+            pageTitle,
+            linksClicked,
+            date: isRandom ? undefined : new Date().toISOString().split("T")[0],
+            puzzle: isRandom && randomPuzzle ? randomPuzzle : undefined,
+        });
+    }, [pageTitle, linksClicked]); // eslint-disable-line react-hooks/exhaustive-deps
 
     const handleWikiContentClick = useCallback(
         (e: React.MouseEvent<HTMLDivElement>) => {
@@ -99,10 +174,7 @@ export const GamePage = () => {
             setPageTitle(title);
 
             const allLinksClicked = linksClicked.concat(title);
-
             setLinksClicked(allLinksClicked);
-
-            localStorage.setItem("linksClicked", JSON.stringify(allLinksClicked));
         },
         [linksClicked]
     );

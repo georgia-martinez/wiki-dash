@@ -82,7 +82,6 @@ If you want to input data, you may either do so manually through the local datab
 
 ```
 cd back-end
-npm install
 npx convex import --table scores sampledata.jsonl
 npx convex import --table dailyChallenge samplechallenge.jsonl
 ```
