@@ -116,9 +116,15 @@ function Scoreboard({ sortBy, selectedDate }: { sortBy: SortBy; selectedDate?: s
 
     const filtered = (scores ?? []).filter((s) => (selectedDate ? s.date === selectedDate : true));
 
-    const sorted = [...filtered].sort((a, b) =>
-        sortBy === "time" ? a.timeSpent - b.timeSpent : a.pagesClicked - b.pagesClicked
-    );
+    const sorted = [...filtered].sort((a, b) => {
+        if (sortBy === "time") {
+            const timeDiff = a.timeSpent - b.timeSpent;
+            return timeDiff !== 0 ? timeDiff : a.pagesClicked - b.pagesClicked;
+        } else {
+            const pagesDiff = a.pagesClicked - b.pagesClicked;
+            return pagesDiff !== 0 ? pagesDiff : a.timeSpent - b.timeSpent;
+        }
+    });
 
     return (
         <Box sx={{ width: "100%", maxWidth: 640, mx: "auto", mt: 3 }}>
