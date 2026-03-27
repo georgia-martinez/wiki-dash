@@ -33,33 +33,31 @@ export const GamePage = () => {
         : dailyChallenge ? [dailyChallenge.article1, dailyChallenge.article2] : null;
 
     const [pageTitle, setPageTitle] = useState("");
-
-    useEffect(() => {
-        if (!isRandom && dailyChallenge === null) {
-            setLoading(false);
-        } else if (puzzle && !pageTitle) {
-            setPageTitle(puzzle[0]);
-        }
-    }, [puzzle, dailyChallenge, isRandom]);
-
     const article2 = puzzle?.[1] ?? "";
     const [html, setHtml] = useState<string | null>(null);
     const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        if (puzzle && !pageTitle) {
+            setPageTitle(puzzle[0]);
+        }
+    }, [puzzle, pageTitle]);
+
     const challengeLoading = isRandom ? randomLoading : dailyChallenge === undefined;
     const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
-        if (challengeLoading || dailyChallenge !== null) return;
+        if (dailyChallenge === undefined || dailyChallenge !== null) return;
         if (ensureKickSent.current) return;
         ensureKickSent.current = true;
-        void ensureTodaysChallenge().catch(() => {
-            ensureKickSent.current = false;
-        });
-    }, [challengeLoading, dailyChallenge, ensureTodaysChallenge]);
+        void ensureTodaysChallenge().catch(() => {});
+    }, [dailyChallenge, ensureTodaysChallenge]);
+    
     const [linksClicked, setLinksClicked] = useState<string[]>([]);
     const elapsedSecondsRef = useRef(0);
     const timerDisplayRef = useRef<HTMLSpanElement>(null);
     const [won, setWon] = useState(false);
+    const [elapsedSeconds, setElapsedSeconds] = useState(0);
     const [showNonWikiAlert, setShowNonWikiAlert] = useState(false);
 
     useEffect(() => {
@@ -76,6 +74,7 @@ export const GamePage = () => {
 
     useEffect(() => {
         if (article2 && pageTitle === article2) {
+            setElapsedSeconds(elapsedSecondsRef.current);
             setWon(true);
         }
     }, [pageTitle, article2]);
@@ -138,7 +137,7 @@ export const GamePage = () => {
                 startArticle={puzzle?.[0] ?? ""}
                 endArticle={puzzle?.[1] ?? ""}
                 linksClicked={linksClicked.length}
-                elapsedSeconds={elapsedSecondsRef.current}
+                elapsedSeconds={elapsedSeconds}
                 isRandom={isRandom}
             />
             {/* Header */}
@@ -227,7 +226,7 @@ export const GamePage = () => {
                             {error}
                         </Alert>
                     )}
-                    {(challengeLoading || loading) && (
+                    {(challengeLoading || (loading && !!pageTitle)) && (
                         <Box display="flex" justifyContent="center" p={4}>
                             <CircularProgress />
                         </Box>

@@ -15,6 +15,29 @@ const NSFW_CATEGORIES = [
     "Category:Sex industry",
 ];
 
+/** Wikimedia often lags 1–2+ days before top pageviews exist for a calendar day (404 + ~325B JSON). */
+async function fetchTopArticlesForRecentDay(): Promise<{ article: string }[]> {
+    for (let daysBack = 1; daysBack <= 14; daysBack++) {
+        const d = new Date();
+        d.setUTCDate(d.getUTCDate() - daysBack);
+        const y = d.getUTCFullYear();
+        const month = String(d.getUTCMonth() + 1).padStart(2, "0");
+        const day = String(d.getUTCDate()).padStart(2, "0");
+        const url = `${WIKIMEDIA_API}/metrics/pageviews/top/en.wikipedia/all-access/${y}/${month}/${day}`;
+        const res = await fetch(url);
+        if (!res.ok) continue;
+        let data: { items?: { articles?: { article: string }[] }[] };
+        try {
+            data = await res.json();
+        } catch {
+            continue;
+        }
+        const articles = data.items?.[0]?.articles ?? [];
+        if (articles.length >= 10) return articles;
+    }
+    throw new Error("No Wikimedia pageview top data for the last two weeks (API lag or outage)");
+}
+
 async function isNSFW(title: string): Promise<boolean> {
     const encoded = encodeURIComponent(title.replaceAll(" ", "_"));
     const clcategories = NSFW_CATEGORIES.map(encodeURIComponent).join("|");
@@ -77,18 +100,7 @@ export const setDailyChallenge = internalMutation({
 export const fetchAndSetDailyChallenge = internalAction({
     args: {},
     handler: async (ctx) => {
-        const yesterday = new Date();
-        yesterday.setDate(yesterday.getDate() - 1);
-        const year = yesterday.getFullYear();
-        const month = String(yesterday.getMonth() + 1).padStart(2, "0");
-        const day = String(yesterday.getDate()).padStart(2, "0");
-
-        const res = await fetch(
-            `${WIKIMEDIA_API}/metrics/pageviews/top/en.wikipedia/all-access/${year}/${month}/${day}`
-        );
-        if (!res.ok) throw new Error("Failed to fetch popular pages");
-        const data = await res.json();
-        const articles: { article: string }[] = data.items?.[0]?.articles ?? [];
+        const articles = await fetchTopArticlesForRecentDay();
 
         const filtered = articles
             .map((a) => a.article.replaceAll("_", " "))
@@ -101,19 +113,22 @@ export const fetchAndSetDailyChallenge = internalAction({
 
         if (filtered.length < 2) throw new Error("Not enough popular articles");
 
-        const safeFiltered: string[] = [];
-        for (const title of filtered) {
-            if (!(await isNSFW(title))) safeFiltered.push(title);
-        }
-        if (safeFiltered.length < 2) throw new Error("Not enough safe articles");
+        const shuffled = filtered.sort(() => Math.random() - 0.5);
+        let article1: string | null = null;
+        let article2: string | null = null;
 
-        const i = Math.floor(Math.random() * safeFiltered.length);
-        let j = Math.floor(Math.random() * (safeFiltered.length - 1));
-        if (j >= i) j++;
+        for (const title of shuffled) {
+            if (await isNSFW(title)) continue;
+            if (!article1) { article1 = title; continue; }
+            article2 = title;
+            break;
+        }
+
+        if (!article1 || !article2) throw new Error("Not enough safe articles");
 
         await ctx.runMutation(internal.challenges.setDailyChallenge, {
-            article1: safeFiltered[i],
-            article2: safeFiltered[j],
+            article1,
+            article2,
         });
     },
 });
