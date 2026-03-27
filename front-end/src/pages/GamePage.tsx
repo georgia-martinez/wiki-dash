@@ -1,7 +1,7 @@
 import { Alert, Box, Button, CircularProgress, Snackbar, Stack, Typography } from "@mui/material";
+import { useMutation, useQuery } from "convex/react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useSearchParams } from "react-router-dom";
-import { useMutation, useQuery } from "convex/react";
 import { api } from "../../../back-end/convex/_generated/api";
 import { WinModal } from "../components/WinModal";
 import { fetchWikiPage, getRandomWikiPages, getTitleFromWikiHref } from "../utils/mediaWikiApi";
@@ -23,7 +23,8 @@ function readCache(isRandom: boolean): (GameCache & { elapsedSeconds: number }) 
         if (!raw) return null;
         const data: GameCache = JSON.parse(raw);
         if (!isRandom && data.date !== new Date().toISOString().split("T")[0]) return null;
-        const elapsed = parseInt(localStorage.getItem(cacheKey(isRandom) + "_elapsed") ?? "0", 10) || 0;
+        const elapsed =
+            parseInt(localStorage.getItem(cacheKey(isRandom) + "_elapsed") ?? "0", 10) || 0;
         return { ...data, elapsedSeconds: elapsed };
     } catch {
         return null;
@@ -84,7 +85,9 @@ export const GamePage = () => {
 
     const puzzle: [string, string] | null = isRandom
         ? randomPuzzle
-        : dailyChallenge ? [dailyChallenge.article1, dailyChallenge.article2] : null;
+        : dailyChallenge
+          ? [dailyChallenge.article1, dailyChallenge.article2]
+          : null;
 
     const [pageTitle, setPageTitle] = useState(cachedState?.pageTitle ?? "");
     const article2 = puzzle?.[1] ?? "";
@@ -218,7 +221,7 @@ export const GamePage = () => {
                 sx={{
                     gap: 1,
                     backgroundColor: "background.paper",
-                    py: 1,
+                    py: 2,
                     px: 4,
                     flexShrink: 0,
                     borderBottom: "1px solid",
@@ -271,9 +274,7 @@ export const GamePage = () => {
                     </Stack>
                     {/* Reset button */}
                     <Stack direction="row" gap={1} alignItems="center">
-                        <Typography variant="body2">
-                            NOTE: Will reset links clicked but not time
-                        </Typography>
+                        <Typography variant="body2">Resets links clicked but not time</Typography>
                         <Button
                             variant="outlined"
                             color="primary"
@@ -286,7 +287,7 @@ export const GamePage = () => {
                                 }
                             }}
                         >
-                            Reset
+                            Reset Game
                         </Button>
                     </Stack>
                 </Stack>
