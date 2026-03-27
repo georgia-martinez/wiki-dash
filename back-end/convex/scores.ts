@@ -7,6 +7,7 @@ export const submit = mutation({
         pagesClicked: v.number(),
         timeSpent: v.number(),
         date: v.string(),
+        path: v.optional(v.array(v.string())),
     },
     handler: async (ctx, args) => {
         await ctx.db.insert("scores", args);

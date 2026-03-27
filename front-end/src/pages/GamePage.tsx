@@ -139,6 +139,7 @@ export const GamePage = () => {
                 linksClicked={linksClicked.length}
                 elapsedSeconds={elapsedSeconds}
                 isRandom={isRandom}
+                path={linksClicked}
             />
             {/* Header */}
             <Stack

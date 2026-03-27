@@ -14,9 +14,10 @@ interface WinModalProps {
     linksClicked: number;
     elapsedSeconds: number;
     isRandom?: boolean;
+    path?: string[];
 }
 
-export const WinModal = ({ open, startArticle, endArticle, linksClicked, elapsedSeconds, isRandom }: WinModalProps) => {
+export const WinModal = ({ open, startArticle, endArticle, linksClicked, elapsedSeconds, isRandom, path }: WinModalProps) => {
     const [name, setName] = useState("");
     const [submitted, setSubmitted] = useState(false);
     const navigate = useNavigate();
@@ -27,7 +28,7 @@ export const WinModal = ({ open, startArticle, endArticle, linksClicked, elapsed
     const seconds = String(elapsedSeconds % 60).padStart(2, "0");
 
     const handleSubmit = (username: string) => {
-        submitScore({ username, pagesClicked: linksClicked, timeSpent: elapsedSeconds, date: new Date().toISOString().split("T")[0] });
+        submitScore({ username, pagesClicked: linksClicked, timeSpent: elapsedSeconds, date: new Date().toISOString().split("T")[0], path });
         setSubmitted(true);
     };
 

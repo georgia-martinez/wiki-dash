@@ -7,6 +7,7 @@ export default defineSchema({
     pagesClicked: v.number(),
     timeSpent: v.number(),
     date: v.optional(v.string()),
+    path: v.optional(v.array(v.string())),
   }),
   dailyChallenge: defineTable({
     date: v.string(), // YYYY-MM-DD

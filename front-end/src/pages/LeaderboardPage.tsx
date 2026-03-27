@@ -34,55 +34,49 @@ export const LeaderboardPage = () => {
     const navigate = useNavigate();
 
     return (
-        <Stack
-            sx={{
-                mt: 8,
-                mx: "auto",
-                width: "100%",
-                maxWidth: 640,
-                px: { xs: 2, sm: 3 },
-            }}
-        >
-            <Stack
-                direction="row"
-                alignItems="center"
-                justifyContent="space-between"
-                gap={2}
-                sx={{ width: "100%" }}
-            >
-                <Typography variant="h4" fontWeight="bold" component="h1">
-                    Leaderboard
-                </Typography>
-                <Button variant="contained" onClick={() => navigate("/")} sx={{ flexShrink: 0 }}>
-                    Back to Home
-                </Button>
-            </Stack>
-            <Stack
-                direction="row"
-                spacing={2}
-                alignItems="center"
-                sx={{ mt: 2, width: "100%" }}
-            >
-                <Box sx={{ flex: 1, minWidth: 0 }}>
-                    <SortDropdown value={sortBy} onChange={setSortBy} />
-                </Box>
-                <TextField
-                    type="date"
-                    size="small"
-                    label="Filter by date"
-                    value={selectedDate}
-                    onChange={(e) => setSelectedDate(e.target.value)}
-                    fullWidth
-                    sx={{ flex: 1, minWidth: 0 }}
-                    slotProps={{ inputLabel: { shrink: true }, htmlInput: { max: today } }}
-                />
-                <Button variant="outlined" onClick={() => setSelectedDate(today)} sx={{ flexShrink: 0 }}>
-                    Today
-                </Button>
+        <Stack sx={{ position: "fixed", inset: 0, overflow: "hidden", pt: 8, mx: "auto", width: "100%", maxWidth: 640, px: { xs: 2, sm: 3 } }}>
+            <Stack>
+                <Stack
+                    direction="row"
+                    alignItems="center"
+                    justifyContent="space-between"
+                    gap={2}
+                    sx={{ width: "100%" }}
+                >
+                    <Typography variant="h4" fontWeight="bold" component="h1">
+                        Leaderboard
+                    </Typography>
+                    <Button variant="contained" onClick={() => navigate("/")} sx={{ flexShrink: 0 }}>
+                        Back to Home
+                    </Button>
+                </Stack>
+                <Stack
+                    direction="row"
+                    spacing={2}
+                    alignItems="center"
+                    sx={{ mt: 2, width: "100%" }}
+                >
+                    <Box sx={{ flex: 1, minWidth: 0 }}>
+                        <SortDropdown value={sortBy} onChange={setSortBy} />
+                    </Box>
+                    <TextField
+                        type="date"
+                        size="small"
+                        label="Filter by date"
+                        value={selectedDate}
+                        onChange={(e) => setSelectedDate(e.target.value)}
+                        fullWidth
+                        sx={{ flex: 1, minWidth: 0 }}
+                        slotProps={{ inputLabel: { shrink: true }, htmlInput: { max: today } }}
+                    />
+                    <Button variant="outlined" onClick={() => setSelectedDate(today)} sx={{ flexShrink: 0 }}>
+                        Today
+                    </Button>
+                </Stack>
+                <ChallengeInfo date={selectedDate} />
             </Stack>
             <ErrorBoundary message="Error loading leaderboard. Please try again later.">
                 <Stack alignItems="center" sx={{ width: "100%" }}>
-                    <ChallengeInfo date={selectedDate} />
                     <Scoreboard sortBy={sortBy} selectedDate={selectedDate} />
                 </Stack>
             </ErrorBoundary>
