@@ -93,6 +93,6 @@ To set your own sample data, modify `sample-challenge.jsonl` and `sample-leaderb
 
 ## Development Workflow
 
-Pushing up changes to the `main` auto deploys to [https://wiki-dash-staging.fly.dev/](https://wiki-dash-staging.fly.dev/). 
+Pushing up changes to `main` auto deploys to [https://wiki-dash-staging.fly.dev/](https://wiki-dash-staging.fly.dev/). 
 
 To promote to production, simply merge in the changes from `main` into the `production` branch which will auto deploy to [https://wiki-dash.fly.dev/](https://wiki-dash.fly.dev/)

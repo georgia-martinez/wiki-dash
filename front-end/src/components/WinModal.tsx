@@ -3,9 +3,40 @@ import { Box, Button, Dialog, DialogContent, Stack, TextField, Typography } from
 import { useMutation } from "convex/react";
 import { useState } from "react";
 import Confetti from "react-confetti";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { api } from "../../../back-end/convex/_generated/api";
 import { ArticleTag } from "./ArticleTag";
+
+export interface PendingWin {
+    startArticle: string;
+    endArticle: string;
+    linksClicked: number;
+    elapsedSeconds: number;
+    isRandom?: boolean;
+    path?: string[];
+}
+
+const PENDING_WIN_KEY = "wikiDash_pendingWin";
+
+export function savePendingWin(data: PendingWin) {
+    try {
+        localStorage.setItem(PENDING_WIN_KEY, JSON.stringify(data));
+    } catch {}
+}
+
+export function loadPendingWin(): PendingWin | null {
+    try {
+        const raw = localStorage.getItem(PENDING_WIN_KEY);
+        if (!raw) return null;
+        return JSON.parse(raw);
+    } catch {
+        return null;
+    }
+}
+
+export function clearPendingWin() {
+    localStorage.removeItem(PENDING_WIN_KEY);
+}
 
 interface WinModalProps {
     open: boolean;
@@ -29,6 +60,7 @@ export const WinModal = ({
     const [name, setName] = useState("");
     const [submitted, setSubmitted] = useState(false);
     const navigate = useNavigate();
+    const location = useLocation();
     const { isSignedIn, user } = useUser();
     const submitScore = useMutation(api.scores.submit);
 
@@ -44,6 +76,7 @@ export const WinModal = ({
             path,
         });
         setSubmitted(true);
+        clearPendingWin();
     };
 
     const displayName = user?.fullName ?? user?.username ?? "";
@@ -148,10 +181,23 @@ export const WinModal = ({
                                         <Typography variant="body1" textAlign="center">
                                             Enter your name for the leaderboard, or
                                         </Typography>
-                                        <SignInButton mode="modal">
+                                        <SignInButton
+                                            mode="modal"
+                                            forceRedirectUrl={location.pathname + location.search}
+                                        >
                                             <Typography
                                                 variant="body1"
                                                 sx={{ cursor: "pointer", color: "#3366cc" }}
+                                                onClick={() =>
+                                                    savePendingWin({
+                                                        startArticle,
+                                                        endArticle,
+                                                        linksClicked,
+                                                        elapsedSeconds,
+                                                        isRandom,
+                                                        path,
+                                                    })
+                                                }
                                             >
                                                 sign in
                                             </Typography>
@@ -181,13 +227,13 @@ export const WinModal = ({
                         {!isRandom && (
                             <Button
                                 variant="outlined"
-                                onClick={() => navigate("/leaderboard", { replace: true })}
+                                onClick={() => { clearPendingWin(); navigate("/leaderboard"); }}
                                 fullWidth
                             >
                                 View leaderboard
                             </Button>
                         )}
-                        <Button variant="outlined" onClick={() => navigate("/", { replace: true })} fullWidth>
+                        <Button variant="outlined" onClick={() => { clearPendingWin(); navigate("/"); }} fullWidth>
                             Back to home
                         </Button>
                     </Stack>

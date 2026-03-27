@@ -3,7 +3,7 @@ import { useMutation, useQuery } from "convex/react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { api } from "../../../back-end/convex/_generated/api";
-import { WinModal } from "../components/WinModal";
+import { loadPendingWin, WinModal } from "../components/WinModal";
 import { fetchWikiPage, getRandomWikiPages, getTitleFromWikiHref } from "../utils/mediaWikiApi";
 
 interface GameCache {
@@ -110,11 +110,12 @@ export const GamePage = () => {
         void ensureTodaysChallenge().catch(() => {});
     }, [dailyChallenge, ensureTodaysChallenge]);
 
+    const [pendingWin] = useState(() => loadPendingWin());
     const [linksClicked, setLinksClicked] = useState<string[]>(cachedState?.linksClicked ?? []);
     const elapsedSecondsRef = useRef(cachedState?.elapsedSeconds ?? 0);
     const timerDisplayRef = useRef<HTMLSpanElement>(null);
-    const [won, setWon] = useState(false);
-    const [elapsedSeconds, setElapsedSeconds] = useState(0);
+    const [won, setWon] = useState(!!pendingWin);
+    const [elapsedSeconds, setElapsedSeconds] = useState(pendingWin?.elapsedSeconds ?? 0);
     const [showNonWikiAlert, setShowNonWikiAlert] = useState(false);
 
     // Restore timer display from cache after first render
@@ -212,12 +213,12 @@ export const GamePage = () => {
         <Box sx={{ height: "100vh", display: "flex", flexDirection: "column", overflow: "hidden" }}>
             <WinModal
                 open={won}
-                startArticle={puzzle?.[0] ?? ""}
-                endArticle={puzzle?.[1] ?? ""}
-                linksClicked={linksClicked.length}
-                elapsedSeconds={elapsedSeconds}
-                isRandom={isRandom}
-                path={linksClicked}
+                startArticle={pendingWin?.startArticle ?? puzzle?.[0] ?? ""}
+                endArticle={pendingWin?.endArticle ?? puzzle?.[1] ?? ""}
+                linksClicked={pendingWin?.linksClicked ?? linksClicked.length}
+                elapsedSeconds={pendingWin?.elapsedSeconds ?? elapsedSeconds}
+                isRandom={pendingWin?.isRandom ?? isRandom}
+                path={pendingWin?.path ?? linksClicked}
             />
             {/* Header */}
             <Stack
