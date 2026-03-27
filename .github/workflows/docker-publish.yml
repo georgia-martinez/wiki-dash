@@ -50,18 +50,16 @@ jobs:
             georgiamartinez/wiki-dash:${{ steps.env.outputs.image_tag }}
             georgiamartinez/wiki-dash:${{ github.sha }}
 
+      - name: Install flyctl
+        run: curl -L https://fly.io/install.sh | sh && echo "$HOME/.fly/bin" >> $GITHUB_PATH
+
       - name: Deploy frontend to Fly
-        uses: superfly/flyctl-actions@1.5
-        with:
-          args: "deploy --config ${{ steps.env.outputs.fly_config }} --image georgiamartinez/wiki-dash:${{ steps.env.outputs.image_tag }}"
+        run: flyctl deploy --config ${{ steps.env.outputs.fly_config }} --image georgiamartinez/wiki-dash:${{ steps.env.outputs.image_tag }}
         env:
           FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
 
   deploy-backend:
     runs-on: ubuntu-latest
-    env:
-      DOCKER_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
-      DOCKER_PASSWORD: ${{ secrets.DOCKERHUB_TOKEN }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -75,10 +73,11 @@ jobs:
             echo "fly_config=back-end/fly.staging.toml" >> $GITHUB_OUTPUT
           fi
 
+      - name: Install flyctl
+        run: curl -L https://fly.io/install.sh | sh && echo "$HOME/.fly/bin" >> $GITHUB_PATH
+
       - name: Deploy backend to Fly
-        uses: superfly/flyctl-actions@1.5
-        with:
-          args: "deploy --config ${{ steps.env.outputs.fly_config }}"
+        run: flyctl deploy --config ${{ steps.env.outputs.fly_config }}
         env:
           FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
 
