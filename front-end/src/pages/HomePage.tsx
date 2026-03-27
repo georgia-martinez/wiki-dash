@@ -1,15 +1,12 @@
 import { SignInButton, UserButton, useUser } from "@clerk/react";
 import { Box, Stack, Typography } from "@mui/material";
-import { useQuery } from "convex/react";
 import { Link } from "react-router-dom";
-import { api } from "../../../back-end/convex/_generated/api";
 import { ExternalLink } from "../components/ExternalLink";
 import { Header } from "../components/Header";
 import { PhotoViewer } from "../components/PhotoViewer";
 
 export const HomePage = () => {
     const { isSignedIn } = useUser();
-    const todaysChallenge = useQuery(api.challenges.getTodaysChallenge);
 
     return (
         <Stack sx={{ px: 30, gap: 2, justifyContent: "center" }}>
