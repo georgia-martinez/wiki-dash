@@ -151,7 +151,7 @@ export const GamePage = () => {
 
     // Persist game state whenever the current article or path changes
     useEffect(() => {
-        if (!pageTitle || won) return;
+        if (!pageTitle || won || (article2 && pageTitle === article2)) return;
         saveCache(isRandom, {
             pageTitle,
             linksClicked,
