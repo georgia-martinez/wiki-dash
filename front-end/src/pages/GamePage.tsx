@@ -143,6 +143,9 @@ export const GamePage = () => {
             setElapsedSeconds(elapsedSecondsRef.current);
             setWon(true);
             clearCache(isRandom);
+            if (!isRandom) {
+                localStorage.setItem("wikiDash_daily_completed", new Date().toISOString().split("T")[0]);
+            }
         }
     }, [pageTitle, article2]); // eslint-disable-line react-hooks/exhaustive-deps
 
