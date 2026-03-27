@@ -48,7 +48,7 @@ jobs:
             georgiamartinez/wiki-dash:${{ github.sha }}
 
       - name: Deploy frontend to Fly
-        uses: superfly/flyctl-actions@master
+        uses: superfly/flyctl-actions@1.5
         with:
           args: "deploy --config ${{ steps.env.outputs.fly_config }} --image georgiamartinez/wiki-dash:${{ steps.env.outputs.image_tag }}"
         env:
@@ -70,7 +70,7 @@ jobs:
           fi
 
       - name: Deploy backend to Fly
-        uses: superfly/flyctl-actions@master
+        uses: superfly/flyctl-actions@1.5
         with:
           args: "deploy --config ${{ steps.env.outputs.fly_config }}"
         env:
