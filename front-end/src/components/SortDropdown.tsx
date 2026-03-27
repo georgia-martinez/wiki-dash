@@ -9,7 +9,7 @@ interface SortDropdownProps {
 
 function SortDropdown({ value, onChange }: SortDropdownProps) {
   return (
-    <FormControl size="small" sx={{ minWidth: 180 }}>
+    <FormControl size="small" fullWidth sx={{ minWidth: 0 }}>
       <InputLabel>Rank by</InputLabel>
       <Select
         value={value}

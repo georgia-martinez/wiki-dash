@@ -1,4 +1,5 @@
 import { Box, Button, Dialog, DialogContent, Stack, TextField, Typography } from "@mui/material";
+import { ArticleTag } from "./ArticleTag";
 import { SignInButton, useUser } from "@clerk/react";
 import { useState } from "react";
 import Confetti from "react-confetti";
@@ -34,7 +35,13 @@ export const WinModal = ({ open, startArticle, endArticle, linksClicked, elapsed
 
     return (
         <>
-            {open && <Confetti numberOfPieces={300} recycle={false} style={{ position: "fixed", zIndex: 9999 }} />}
+            {open && (
+                <Confetti
+                    numberOfPieces={300}
+                    recycle={false}
+                    style={{ position: "fixed", zIndex: 9999 }}
+                />
+            )}
             <Dialog
                 open={open}
                 maxWidth="sm"
@@ -45,93 +52,128 @@ export const WinModal = ({ open, startArticle, endArticle, linksClicked, elapsed
                     },
                 }}
                 PaperProps={{
-                    sx: { borderRadius: 3, p: 2, backgroundColor: "white" },
+                    sx: { borderRadius: 4, p: 2, backgroundColor: "white" },
                 }}
             >
                 <DialogContent>
                     <Stack spacing={3} alignItems="center">
+                        <Typography fontSize={48} lineHeight={1}>🏆</Typography>
                         <Typography variant="h3" fontWeight="bold" textAlign="center">
                             You won!
                         </Typography>
-                        <Typography variant="body1" textAlign="center" color="text.secondary">
-                            You navigated from{" "}
-                            <Box component="span" fontWeight="bold" color="text.primary">
-                                {startArticle}
-                            </Box>{" "}
-                            to{" "}
-                            <Box component="span" fontWeight="bold" color="text.primary">
-                                {endArticle}
-                            </Box>
-                        </Typography>
 
-                        <Stack direction="row" gap={4} justifyContent="center">
-                            <Stack alignItems="center">
+                        <Stack direction="row" alignItems="center" gap={1.5}>
+                            <ArticleTag label={startArticle} />
+                            <Typography color="text.secondary">→</Typography>
+                            <ArticleTag label={endArticle} />
+                        </Stack>
+
+                        <Stack direction="row" gap={2} width="100%">
+                            <Box
+                                sx={{
+                                    flex: 1,
+                                    bgcolor: "#f5f5f5",
+                                    borderRadius: 3,
+                                    p: 2.5,
+                                    textAlign: "center",
+                                }}
+                            >
+                                <Typography variant="body2" color="text.secondary" mb={0.5}>
+                                    Links clicked
+                                </Typography>
                                 <Typography variant="h4" fontWeight="bold">
                                     {linksClicked}
                                 </Typography>
-                                <Typography variant="body2" color="text.secondary">
-                                    links clicked
+                            </Box>
+                            <Box
+                                sx={{
+                                    flex: 1,
+                                    bgcolor: "#f5f5f5",
+                                    borderRadius: 3,
+                                    p: 2.5,
+                                    textAlign: "center",
+                                }}
+                            >
+                                <Typography variant="body2" color="text.secondary" mb={0.5}>
+                                    Time
                                 </Typography>
-                            </Stack>
-                            <Stack alignItems="center">
                                 <Typography variant="h4" fontWeight="bold">
                                     {minutes}:{seconds}
                                 </Typography>
-                                <Typography variant="body2" color="text.secondary">
-                                    time
-                                </Typography>
-                            </Stack>
+                            </Box>
                         </Stack>
 
-                        {!isRandom && (submitted ? (
-                            <Typography variant="body1" color="success.main" fontWeight="bold">
-                                Thanks, {isSignedIn ? displayName : name}! You'll be on the leaderboard soon.
-                            </Typography>
-                        ) : isSignedIn ? (
-                            <Stack spacing={1.5} width="100%" alignItems="center">
-                                <Typography variant="body1" textAlign="center">
-                                    Submitting as <strong>{displayName}</strong>
+                        {!isRandom &&
+                            (submitted ? (
+                                <Typography variant="body1" color="success.main" fontWeight="bold" textAlign="center">
+                                    Thanks for playing {isSignedIn ? displayName : name}!
                                 </Typography>
-                                <Button variant="outlined" onClick={() => handleSubmit(displayName)} fullWidth>
-                                    Add to Leaderboard
-                                </Button>
-                            </Stack>
-                        ) : (
-                            <Stack spacing={1.5} width="100%">
-                                <Stack direction="row" gap={1} justifyContent="center">
+                            ) : isSignedIn ? (
+                                <Stack spacing={1.5} width="100%" alignItems="center">
                                     <Typography variant="body1" textAlign="center">
-                                        Enter your name for the leaderboard, or
+                                        Submitting as <strong>{displayName}</strong>
                                     </Typography>
-                                    <SignInButton mode="modal">
-                                        <Button variant="text" size="small" sx={{ textTransform: "none", p: 0 }}>
-                                            sign in
-                                        </Button>
-                                    </SignInButton>
-                                </Stack>
-                                <Stack direction="row" gap={1}>
-                                    <TextField
+                                    <Button
+                                        variant="outlined"
+                                        onClick={() => handleSubmit(displayName)}
                                         fullWidth
-                                        size="small"
-                                        placeholder="Your name"
-                                        value={name}
-                                        onChange={(e) => setName(e.target.value)}
-                                        onKeyDown={(e) => e.key === "Enter" && handleSubmit(name.trim())}
-                                    />
-                                    <Button variant="contained" onClick={() => handleSubmit(name.trim())} disabled={!name.trim()}>
-                                        Submit
+                                    >
+                                        Add to leaderboard
                                     </Button>
                                 </Stack>
-                            </Stack>
-                        ))}
+                            ) : (
+                                <Stack spacing={1.5} width="100%">
+                                    <Stack direction="row" gap={0.5} justifyContent="center">
+                                        <Typography variant="body1" textAlign="center">
+                                            Enter your name for the leaderboard, or
+                                        </Typography>
+                                        <SignInButton mode="modal">
+                                            <Typography
+                                                variant="body1"
+                                                sx={{ cursor: "pointer", color: "#3366cc" }}
+                                            >
+                                                sign in
+                                            </Typography>
+                                        </SignInButton>
+                                    </Stack>
+                                    <Stack direction="row" gap={1}>
+                                        <TextField
+                                            fullWidth
+                                            size="small"
+                                            placeholder="Your name"
+                                            value={name}
+                                            onChange={(e) => setName(e.target.value)}
+                                            onKeyDown={(e) =>
+                                                e.key === "Enter" && handleSubmit(name.trim())
+                                            }
+                                        />
+                                        <Button
+                                            variant="outlined"
+                                            onClick={() => handleSubmit(name.trim())}
+                                            disabled={!name.trim()}
+                                        >
+                                            Submit
+                                        </Button>
+                                    </Stack>
+                                </Stack>
+                            ))}
 
                         {!isRandom && (
-                            <Button variant="contained" onClick={() => navigate("/leaderboard")} fullWidth>
-                                View Leaderboard
+                            <Button
+                                variant="contained"
+                                onClick={() => navigate("/leaderboard")}
+                                fullWidth
+                            >
+                                View leaderboard
                             </Button>
                         )}
-                        <Button variant="outlined" onClick={() => navigate("/")} fullWidth>
-                            Back to Home
-                         </Button>
+                        <Button
+                            variant="outlined"
+                            onClick={() => navigate("/")}
+                            fullWidth
+                        >
+                            Back to home
+                        </Button>
                     </Stack>
                 </DialogContent>
             </Dialog>

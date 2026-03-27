@@ -32,12 +32,16 @@ export const GamePage = () => {
         ? randomPuzzle
         : dailyChallenge ? [dailyChallenge.article1, dailyChallenge.article2] : null;
 
-    /** User navigation override; empty means "use puzzle start article" (avoids setState-in-effect sync). */
     const [pageTitle, setPageTitle] = useState("");
-    const currentArticle = pageTitle || puzzle?.[0] || "";
     const article2 = puzzle?.[1] ?? "";
     const [html, setHtml] = useState<string | null>(null);
-    const [loading, setLoading] = useState(false);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        if (puzzle && !pageTitle) {
+            setPageTitle(puzzle[0]);
+        }
+    }, [puzzle, pageTitle]);
 
     const challengeLoading = isRandom ? randomLoading : dailyChallenge === undefined;
     const [error, setError] = useState<string | null>(null);
@@ -69,11 +73,11 @@ export const GamePage = () => {
     }, [loading, won]);
 
     useEffect(() => {
-        if (article2 && currentArticle === article2) {
+        if (article2 && pageTitle === article2) {
             setElapsedSeconds(elapsedSecondsRef.current);
             setWon(true);
         }
-    }, [currentArticle, article2]);
+    }, [pageTitle, article2]);
 
     const handleWikiContentClick = useCallback(
         (e: React.MouseEvent<HTMLDivElement>) => {
@@ -104,26 +108,27 @@ export const GamePage = () => {
     );
 
     useEffect(() => {
-        if (!currentArticle) return;
+        if (!pageTitle) return;
         let cancelled = false;
-        void (async () => {
-            setLoading(true);
-            try {
-                const { html: nextHtml } = await fetchWikiPage(currentArticle);
-                if (!cancelled) setHtml(nextHtml);
-            } catch (err) {
+        fetchWikiPage(pageTitle)
+            .then(({ html }) => {
+                if (!cancelled) {
+                    setHtml(html);
+                }
+            })
+            .catch((err) => {
                 if (!cancelled) {
                     setError(err instanceof Error ? err.message : "Something went wrong");
                     setHtml(null);
                 }
-            } finally {
+            })
+            .finally(() => {
                 if (!cancelled) setLoading(false);
-            }
-        })();
+            });
         return () => {
             cancelled = true;
         };
-    }, [currentArticle]);
+    }, [pageTitle]);
 
     return (
         <Box sx={{ height: "100vh", display: "flex", flexDirection: "column", overflow: "hidden" }}>
@@ -188,7 +193,7 @@ export const GamePage = () => {
                     <Stack direction="row" gap={1}>
                         <Typography variant="h5">Current article:</Typography>
                         <Typography variant="h5" sx={{ fontWeight: "bold" }}>
-                            {currentArticle}
+                            {pageTitle}
                         </Typography>
                     </Stack>
                     {/* Reset button */}
@@ -200,8 +205,8 @@ export const GamePage = () => {
                             variant="outlined"
                             color="primary"
                             onClick={() => {
-                                if (puzzle?.[0] && currentArticle !== puzzle[0]) {
-                                    setPageTitle("");
+                                if (puzzle?.[0] && pageTitle !== puzzle[0]) {
+                                    setPageTitle(puzzle[0]);
                                     setLoading(true);
                                     setError(null);
                                     setLinksClicked([]);
@@ -221,7 +226,7 @@ export const GamePage = () => {
                             {error}
                         </Alert>
                     )}
-                    {(challengeLoading || (loading && !!currentArticle)) && (
+                    {(challengeLoading || (loading && !!pageTitle)) && (
                         <Box display="flex" justifyContent="center" p={4}>
                             <CircularProgress />
                         </Box>

@@ -6,6 +6,17 @@ const bodyFont =
 
 export const theme = createTheme({
     components: {
+        MuiButton: {
+            styleOverrides: {
+                root: {
+                    textTransform: "none",
+                    boxShadow: "none",
+                    "&:hover": {
+                        boxShadow: "none",
+                    },
+                },
+            },
+        },
         MuiCssBaseline: {
             styleOverrides: {
                 a: {
