@@ -1,7 +1,5 @@
 # WikiDash 📚🏁
 
-[https://wiki-dash.fly.dev/](https://wiki-dash.fly.dev/)
-
 WikiDash is a website where users compete in daily challenges to get from one randomly generated Wikipedia article to another by clicking links within the articles. When a challenge is completed, users can see where they rank on the global leaderboard which is ranked by time taken and the number of links clicked. This project was done as part of a month long hackathon from February 27th, 2026 to March 27th, 2026.
 
 ## Tech Stack
